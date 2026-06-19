@@ -148,3 +148,5 @@ scratch/
 # Keep models directory structure but ignore model binaries
 models/*
 !models/.gitkeep
+presentation_guide.md
+reports/operational_incident_report.pdf

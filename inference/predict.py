@@ -15,6 +15,34 @@ from inference.similarity import IncidentSimilarityRetriever
 from training.train_regression import BestRegressionEnsemble
 from utils.calibration import CalibratorWrapper, MulticlassCalibratorWrapper
 
+def make_json_safe(obj):
+    import numpy as np
+    import pandas as pd
+    if isinstance(obj, dict):
+        return {k: make_json_safe(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [make_json_safe(x) for x in obj]
+    elif isinstance(obj, (float, np.floating)):
+        if np.isnan(obj) or np.isinf(obj):
+            return None
+        return float(obj)
+    elif isinstance(obj, (int, np.integer)):
+        return int(obj)
+    elif isinstance(obj, str):
+        return obj
+    elif isinstance(obj, bool):
+        return obj
+    elif pd.isnull(obj):
+        return None
+    else:
+        try:
+            if np.isnan(obj):
+                return None
+        except Exception:
+            pass
+        return obj
+
+
 class InferencePipeline:
     """
     Module 10: Complete Prediction Pipeline & MLOps scoring interface.
@@ -117,7 +145,7 @@ class InferencePipeline:
         """
         df_raw = pd.DataFrame([event_data])
         df_scored = self.predict_batch(df_raw)
-        return df_scored.iloc[0].to_dict()
+        return make_json_safe(df_scored.iloc[0].to_dict())
         
     def predict_batch(self, df_raw: pd.DataFrame) -> pd.DataFrame:
         """
@@ -445,16 +473,24 @@ class InferencePipeline:
                 
             explanation_narratives.append(narrative)
             
-        # Compile into single DataFrame
         df_out = df_raw.copy()
         df_out['road_closure_prob'] = road_closure_probs
-        df_out['predicted_duration'] = predicted_durations
+        
+        # Clip predicted duration and its confidence bounds to prevent mathematical overflow
+        # caused by Box-Cox inverse power transform extrapolating values.
+        df_out['predicted_duration'] = np.clip(predicted_durations, 0.0, 1440.0)
+        
         if self.target_transformer_duration is not None:
-            df_out['duration_min_bound'] = self.target_transformer_duration.inverse_transform(predicted_transformed_durations - 1.96 * self.residuals_std)
-            df_out['duration_max_bound'] = self.target_transformer_duration.inverse_transform(predicted_transformed_durations + 1.96 * self.residuals_std)
+            raw_min = self.target_transformer_duration.inverse_transform(predicted_transformed_durations - 1.96 * self.residuals_std)
+            raw_max = self.target_transformer_duration.inverse_transform(predicted_transformed_durations + 1.96 * self.residuals_std)
         else:
-            df_out['duration_min_bound'] = np.clip(np.expm1(predicted_transformed_durations - 1.96 * self.residuals_std), 5.0, None)
-            df_out['duration_max_bound'] = np.clip(np.expm1(predicted_transformed_durations + 1.96 * self.residuals_std), 5.0, None)
+            raw_min = np.expm1(predicted_transformed_durations - 1.96 * self.residuals_std)
+            raw_max = np.expm1(predicted_transformed_durations + 1.96 * self.residuals_std)
+            
+        df_out['duration_min_bound'] = np.clip(raw_min, 0.0, 1440.0)
+        df_out['duration_max_bound'] = np.clip(raw_max, 0.0, 1440.0)
+        df_out['duration_min_bound'] = np.minimum(df_out['duration_min_bound'], df_out['duration_max_bound'])
+        
         df_out['predicted_severity'] = severities
         df_out['predicted_severity_prob'] = sev_probs
         df_out['predicted_severity_conf_score'] = sev_conf_scores
