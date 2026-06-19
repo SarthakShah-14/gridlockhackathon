@@ -83,8 +83,8 @@ def train_primary_models(X: pd.DataFrame, y: pd.Series, cat_features: list,
             # Formatting inputs per model
             if model_name == 'catboost':
                 for col in cat_features:
-                    X_tr[col] = X_tr[col].astype(str)
-                    X_val[col] = X_val[col].astype(str)
+                    X_tr[col] = X_tr[col].fillna("None").astype(str)
+                    X_val[col] = X_val[col].fillna("None").astype(str)
                 X_tr_proc, X_val_proc = X_tr, X_val
                 
             else:

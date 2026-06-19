@@ -281,13 +281,13 @@
     <div class="sidebar">
         <div class="brand">BENGALURU TMC</div>
         <ul class="nav-links">
-            <li class="nav-item active" onclick="showPage('dashboard')">Dashboard</li>
-            <li class="nav-item" onclick="showPage('predict')">Predict Event</li>
-            <li class="nav-item" onclick="showPage('analytics')">Hotspot Analysis</li>
-            <li class="nav-item" onclick="showPage('performance')">Model Performance</li>
-            <li class="nav-item" onclick="showPage('explain')">Explainability</li>
-            <li class="nav-item" onclick="showPage('monitoring')">Monitoring Logs</li>
-            <li class="nav-item" onclick="showPage('reports')">Reports</li>
+            <li class="nav-item active" onclick="showPage('dashboard')">What do you want to check today?</li>
+            <li class="nav-item" onclick="showPage('predict')">Shall we plan a new traffic event?</li>
+            <li class="nav-item" onclick="showPage('analytics')">Where are the current hotspots?</li>
+            <li class="nav-item" onclick="showPage('performance')">How is the model performing?</li>
+            <li class="nav-item" onclick="showPage('explain')">Explain the prediction?</li>
+            <li class="nav-item" onclick="showPage('monitoring')">View system logs?</li>
+            <li class="nav-item" onclick="showPage('reports')">Download reports?</li>
         </ul>
     </div>
 
@@ -302,22 +302,22 @@
         <div id="dashboard" class="subpage active">
             <div class="grid-3">
                 <div class="glass-card">
-                    <div class="kpi-title">Avg Prediction Latency</div>
+                    <div class="kpi-title">How fast are predictions?</div>
                     <div class="kpi-value" id="kpi-latency">0.00s</div>
                 </div>
                 <div class="glass-card">
-                    <div class="kpi-title">Active Model Version</div>
+                    <div class="kpi-title">Which model version are we using?</div>
                     <div class="kpi-value" id="kpi-version">v1.2.0</div>
                 </div>
                 <div class="glass-card">
-                    <div class="kpi-title">Geospatial Drift Status</div>
+                    <div class="kpi-title">Is there any data drift, sir?</div>
                     <div class="kpi-value" id="kpi-drift" style="color: var(--accent-green);">No Drift</div>
                 </div>
             </div>
             
             <div class="glass-card">
-                <h3>Bengaluru Traffic Hotspots (DBSCAN Clusters)</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Geospatial hotspots automatically parsed based on dense localized incident counts.</p>
+                <h3>Bengaluru Hotspots (DBSCAN)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Hotspots from dense incident clusters.</p>
                 <div style="height: 350px; background: rgba(15, 23, 42, 0.5); border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;">
                     <!-- Simple Mockup Grid visualization of Bengaluru hotspots -->
                     <div style="width: 80%; height: 80%; display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); gap: 2px;">
@@ -330,6 +330,7 @@
                     <div style="position: absolute; bottom: 12px; left: 12px; font-size: 0.8rem; color: var(--text-muted);">Coordinates mapping Bengaluru center (12.97, 77.59)</div>
                 </div>
             </div>
+                <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error loading hotspots. ದಯವಿಟ್ಟು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</p>
         </div>
 
         <!-- Subpage: Predict -->
@@ -339,15 +340,15 @@
                 <form id="predict-form" onsubmit="submitPrediction(event)">
                     <div class="grid-3" style="margin-top: 20px;">
                         <div class="form-group">
-                            <label>Latitude</label>
+                            <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
                             <input type="number" step="any" name="latitude" value="12.9716" required>
                         </div>
                         <div class="form-group">
-                            <label>Longitude</label>
+                            <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
                             <input type="number" step="any" name="longitude" value="77.5946" required>
                         </div>
                         <div class="form-group">
-                            <label>Priority</label>
+                            <label>How urgent is the incident, sir? (ಮುಖ್ಯತೆ)</label>
                             <select name="priority">
                                 <option value="High">High</option>
                                 <option value="Medium" selected>Medium</option>
@@ -357,15 +358,15 @@
                     </div>
                     <div class="grid-3">
                         <div class="form-group">
-                            <label>Junction</label>
+                            <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
                             <input type="text" name="junction" value="Kempapura Junction" required>
                         </div>
                         <div class="form-group">
-                            <label>Corridor</label>
+                            <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
                             <input type="text" name="corridor" value="Outer Ring Road" required>
                         </div>
                         <div class="form-group">
-                            <label>Event Type</label>
+                            <label>What type of event is it? (ಘಟನೆ ಪ್ರಕಾರ)</label>
                             <select name="event_type">
                                 <option value="accident">Accident</option>
                                 <option value="roadworks">Roadworks</option>
@@ -376,59 +377,60 @@
                     </div>
                     <div class="grid-3">
                         <div class="form-group">
-                            <label>Event Cause</label>
+                            <label>Why did this happen? (ಕಾರಣ)</label>
                             <input type="text" name="event_cause" value="vehicle_breakdown" required>
                         </div>
                         <div class="form-group">
-                            <label>Start Datetime</label>
+                            <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
                             <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn">Generate Decision recommendations</button>
+                    <button type="submit" class="btn">Shall we generate a traffic plan, sir?</button>
                 </form>
             </div>
 
             <!-- Prediction results timeline flowchart -->
             <div class="glass-card" id="results-card" style="display: none;">
-                <h3>Operational Incident Timeline Output</h3>
+                <h3>Incident Summary</h3>
+                <select id="lang-toggle" style="margin-bottom: 12px;">
+                    <option value="en">English</option>
+                    <option value="kn">Bengaluru (Kannada)</option>
+                </select>
                 <div class="timeline">
                     <div class="timeline-step">
                         <div class="step-num">1</div>
                         <div class="step-content">
-                            <h4>ML Ensembles Forecast</h4>
-                            <p><strong>Calibrated Road Closure Probability:</strong> <span id="out-closure" style="color: var(--accent-cyan); font-weight: bold;">0.00%</span> (Confidence: <span id="out-conf">90%</span>)</p>
-                            <p><strong>Predicted Incident Clearance Duration:</strong> <span id="out-duration" style="color: var(--accent-cyan); font-weight: bold;">0.0 mins</span> (Interval range: <span id="out-range">0-0 mins</span>)</p>
-                            <p><strong>Severity Category:</strong> <span id="out-severity" style="font-weight: bold;">N/A</span></p>
+                            <h4><span class="en">What does the model forecast?</span><span class="kn" style="display:none;">ಮಾಡೆಲ್ ಏನು ಮುನ್ಸೂಚಿಸುತ್ತಿದೆ?</span></h4>
+                            <p><span class="en"><strong>Road Closure Forecast:</strong> <span id="out-closure" style="color: var(--accent-cyan); font-weight: bold;">0.00%</span> (Confidence: <span id="out-conf">90%</span>)</span><br/><span class="kn" style="display:none;">ಮಾಡೆಲ್ ರಸ್ತೆಯ ಮುಚ್ಚುವ ಸಾಧ್ಯತೆಯನ್ನು <span id="out-closure">0.00%</span> (ವಿಶ್ವಾಸ ಮಟ್ಟ <span id="out-conf">90%</span>) ಎಂದು ಮುನ್ಸೂಚಿಸುತ್ತದೆ.</span></p>
+                            <p><span class="en"><strong>Clearance Duration:</strong> <span id="out-duration" style="color: var(--accent-cyan); font-weight: bold;">0.0 mins</span> (range: <span id="out-range">0-0 mins</span>)</span><br/><span class="kn" style="display:none;">ಸುದ್ದಿ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಅವಧಿ <span id="out-duration">0.0 mins</span> (ರೇಂಜ್ <span id="out-range">0-0 mins</span>).</span></p>
+                            <p><span class="en"><strong>Severity:</strong> <span id="out-severity" style="font-weight: bold;">N/A</span></span><br/><span class="kn" style="display:none;">ಮಹತ್ವ ಮಟ್ಟ: <span id="out-severity">N/A</span></span></p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">2</div>
                         <div class="step-content">
-                            <h4>Derived Congestion index</h4>
-                            <p><strong>Traffic Congestion Index:</strong> <span id="out-congestion" style="color: var(--accent-cyan); font-weight: bold;">0.0 / 100</span> (Category Level: <span id="out-risk" style="font-weight: bold;">N/A</span>)</p>
+                            <h4><span class="en">What congestion level is expected?</span><span class="kn" style="display:none;">ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್ ಮಟ್ಟ ಏನು?</span></h4>
+                            <p><strong>Expected Congestion:</strong> <span id="out-congestion" style="color: var(--accent-cyan); font-weight: bold;">0.0 / 100</span> (Level: <span id="out-risk" style="font-weight: bold;">N/A</span>)<br/>ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್ <span id="out-congestion">0.0 / 100</span>, ಇದು <span id="out-risk">N/A</span> ಮಟ್ಟಕ್ಕೆ ಸೇರಿದವಾಗಿದೆ.</p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">3</div>
                         <div class="step-content">
-                            <h4>Optimized Resource Allocations</h4>
-                            <p><strong>Manpower:</strong> <span id="out-officers" style="font-weight: bold; color: var(--accent-green);">2 Officers</span> (Staffing bounded [2, 10])</p>
-                            <p><strong>Barricades:</strong> <span id="out-barricades">0 units</span> | <strong>Traffic Cones:</strong> <span id="out-cones">5 units</span></p>
-                            <p><strong>Teams / Vehicles:</strong> <span id="out-teams">0 diversion teams</span> | <span id="out-vehicles">1 patrol vehicle</span></p>
+                            <h4><span class="en">Which resources should we allocate?</span><span class="kn" style="display:none;">ನಾವು ಯಾವ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಬೇಕು?</span></h4>
+                            <p><strong>Allocated Resources:</strong> <span id="out-officers" style="font-weight: bold; color: var(--accent-green);">2 Officers</span> (Staffing bounded [2, 10])<br/>Barricades: <span id="out-barricades">0 units</span> | Traffic Cones: <span id="out-cones">5 units</span><br/>Teams / Vehicles: <span id="out-teams">0 diversion teams</span> | <span id="out-vehicles">1 patrol vehicle</span><br/>ನಾವು <span id="out-officers">2 ಅಧಿಕಾರಿಗಳು</span> ಮತ್ತು ಇತರೆ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವೆವು.</p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">4</div>
                         <div class="step-content">
-                            <h4>Dijkstra Graph Routing Recommendation</h4>
-                            <p><strong>Historical Transition Edge Alternative Junction:</strong> <span id="out-alt-junc" style="font-weight: bold; color: var(--accent-green);">None</span></p>
-                            <p><strong>Transition Edge Corridor:</strong> <span id="out-alt-corr">None</span> (Expected reduction: <span id="out-reduction">0.0%</span>)</p>
+                            <h4><span class="en">Which alternate route do we recommend?</span><span class="kn" style="display:none;">ನಾವು ಯಾವ ಪರ್ಯಾಯ ಮಾರ್ಗವನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ?</span></h4>
+                            <p><strong>Alternate Route:</strong> Junction <span id="out-alt-junc" style="font-weight: bold; color: var(--accent-green);">None</span>, Corridor <span id="out-alt-corr">None</span> (Expected reduction: <span id="out-reduction">0.0%</span>)<br/>ಪರ್ಯಾಯ ಮಾರ್ಗ: ಜಂಕ್ಷನ್ <span id="out-alt-junc">None</span>, ಕಾರಿಡಾರ್ <span id="out-alt-corr">None</span> (ಕಡಿತ: <span id="out-reduction">0.0%</span>)</p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">5</div>
                         <div class="step-content">
-                            <h4>Local Decision narrative</h4>
+                            <h4><span class="en">Summary of recommended actions</span><span class="kn" style="display:none;">ಶಿಫಾರಸು ಮಾಡಲಾದ ಕ್ರಮಗಳ ಸಂಕ್ಷಿಪ್ತ</span></h4>
                             <p style="font-style: italic; margin-top: 8px; color: var(--text-muted);" id="out-narrative"></p>
                         </div>
                     </div>
@@ -481,21 +483,16 @@
         <!-- Subpage: Model Performance -->
         <div id="performance" class="subpage">
             <div class="glass-card">
-                <h3>Multi-Split Experiment Tuning History</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Ensemble benchmarks calculated over Random, GroupKFold, and Chronological Time Splits.</p>
+                <h3>Model Performance Summary</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Key performance metrics for the traffic model.</p>
                 <table>
-                    <thead>
+                        <thead>
                         <tr>
-                            <th>Model Configuration</th>
+                            <th>Model</th>
                             <th>Accuracy</th>
-                            <th>Macro F1</th>
-                            <th>ROC-AUC</th>
-                            <th>PR-AUC</th>
-                            <th>Balanced Accuracy</th>
-                            <th>MCC</th>
                             <th>Inference Latency</th>
                         </tr>
-                    </thead>
+                        </thead>
                     <tbody id="performance-tbody">
                         <!-- Loaded dynamically from experiment_history.json -->
                     </tbody>
@@ -613,6 +610,8 @@
                 loadPerformanceData();
             } else if (pageId === 'monitoring') {
                 loadMonitoringData();
+            } else if (pageId === 'analytics') {
+                loadHotspots();
             } else if (pageId === 'dashboard') {
                 loadDashboardKPIs();
             }
@@ -643,11 +642,6 @@
                                 <tr>
                                     <td><strong>${row.model}</strong></td>
                                     <td>${(row.accuracy*100).toFixed(2)}%</td>
-                                    <td>${row.f1_macro.toFixed(4)}</td>
-                                    <td>${row.roc_auc.toFixed(4)}</td>
-                                    <td>${row.pr_auc.toFixed(4)}</td>
-                                    <td>${(row.balanced_accuracy*100).toFixed(2)}%</td>
-                                    <td>${row.mcc.toFixed(4)}</td>
                                     <td>${row.train_time_sec.toFixed(3)}s</td>
                                 </tr>
                             `;
@@ -664,7 +658,7 @@
                         document.getElementById('mon-cpu').innerText = data.cpu_usage_percent.toFixed(1) + '%';
                         document.getElementById('mon-ram').innerText = data.memory_usage_mb.toFixed(1) + ' MB';
                     }
-                }).catch(err => {});
+                }).catch(err => { console.error('Error loading monitoring:', err); });
                 
             fetch('/api/history')
                 .then(res => res.json())
@@ -755,6 +749,15 @@
                 document.getElementById('out-narrative').innerText = "Prediction failed: " + err;
             });
         }
-    </script>
+function setLanguage(lang) {
+    document.querySelectorAll('.en').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
+    document.querySelectorAll('.kn').forEach(el => el.style.display = lang === 'kn' ? 'inline' : 'none');
+}
+document.getElementById('lang-toggle').addEventListener('change', (e) => {
+    setLanguage(e.target.value);
+});
+// Initialize default language
+setLanguage('en');
+</script>
 </body>
 </html>

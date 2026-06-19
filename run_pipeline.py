@@ -115,8 +115,10 @@ def run():
     selected_features, shap_imp = select_features_shap(X, y_primary, cat_features, top_k=60)
     logger.info(f"Selected top {len(selected_features)} features after selection pruning.")
     
-    X_selected = X[selected_features]
+    X_selected = df_features[selected_features]
     cat_features_selected = [col for col in cat_features if col in selected_features]
+    # Fill NaNs in categorical features to avoid CatBoost errors
+    X_selected[cat_features_selected] = X_selected[cat_features_selected].fillna('Missing').astype(str)
     
     logger.info("Fitting global ordinal encoder for tree models...")
     from sklearn.preprocessing import OrdinalEncoder
@@ -126,7 +128,7 @@ def run():
     # 9. Hyperparameter Optimization using Optuna TPESampler (10 trials each for speed, 100 in production)
     groups = df_features['junction']
     n_trials = 3
-    logger.info("Running Bayesian TPE parameter optimization on Core Models...")
+    logger.info("Running Bayesian TPE parameter optimization on Core Models...")    
     
     logger.info("Tuning Road Closure Classification...")
     best_cb_cls = optimize_catboost(X_selected, y_primary, cat_features_selected, groups=groups, n_trials=n_trials)

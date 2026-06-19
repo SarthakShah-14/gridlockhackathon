@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 def optimize_catboost(X: pd.DataFrame, y: pd.Series, cat_features: list, groups: pd.Series = None, n_trials: int = 100) -> dict:
     X = X.copy()
     for col in cat_features:
-        X[col] = X[col].astype(str)
+        X[col] = X[col].fillna('Missing').astype(str)
         
     def objective(trial):
         params = {
