@@ -40,10 +40,15 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(scored).encode('utf-8'))
             except Exception as e:
+                import traceback
+                print("--- PREDICTION FAILURE TRACEBACK ---")
+                traceback.print_exc()
+                print("-------------------------------------")
                 self.send_response(500)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+
         else:
             self.send_response(404)
             self.end_headers()
