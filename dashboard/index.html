@@ -159,13 +159,6 @@
             margin-bottom: 24px;
         }
 
-        .map-container {
-            width: 100%;
-            height: 300px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -290,6 +283,7 @@
             .sidebar {
                 transform: translateX(0);
             }
+
             .sidebar.collapsed {
                 transform: translateX(-100%) !important;
             }
@@ -413,7 +407,7 @@
                     <div class="kpi-value" id="kpi-version">v1.2.0</div>
                 </div>
                 <div class="glass-card">
-                    <div class="kpi-title">Is there any data drift?</div>
+                    <div class="kpi-title">Is there any data drift, sir?</div>
                     <div class="kpi-value" id="kpi-drift" style="color: var(--accent-green);">No Drift</div>
                 </div>
             </div>
@@ -421,28 +415,8 @@
             <div class="glass-card">
                 <h3>Bengaluru Hotspots (DBSCAN)</h3>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">Hotspots from dense incident clusters.</p>
-                <div
-                    style="height: 350px; background: rgba(15, 23, 42, 0.5); border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <!-- Simple Mockup Grid visualization of Bengaluru hotspots -->
-                    <div
-                        style="width: 80%; height: 80%; display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); gap: 2px;">
-                        <!-- Highlighted active hotspots coordinates -->
-                        <div
-                            style="grid-column: 5; grid-row: 4; background: var(--accent-red); border-radius: 50%; filter: blur(4px);">
-                        </div>
-                        <div
-                            style="grid-column: 7; grid-row: 6; background: var(--accent-red); border-radius: 50%; filter: blur(4px);">
-                        </div>
-                        <div
-                            style="grid-column: 4; grid-row: 7; background: var(--accent-red); border-radius: 50%; filter: blur(4px);">
-                        </div>
-                        <div
-                            style="grid-column: 6; grid-row: 5; background: var(--accent-green); border-radius: 50%; filter: blur(4px);">
-                        </div>
-                    </div>
-                    <div
-                        style="position: absolute; bottom: 12px; left: 12px; font-size: 0.8rem; color: var(--text-muted);">
-                        Coordinates mapping Bengaluru center (12.97, 77.59)</div>
+                <div id="hotspot-map"
+                    style="height: 400px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 1; background: rgba(15, 23, 42, 0.5);">
                 </div>
             </div>
             <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error
@@ -452,32 +426,21 @@
         <!-- Subpage: Predict -->
         <div id="predict" class="subpage">
             <div class="glass-card">
-                <h3
-                    style="background: linear-gradient(135deg, #06b6d4, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 24px; font-size: 1.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: inline-block; width: 100%;">
-                    Submit Live Incident Details</h3>
+                <h3>Submit Live Incident Details</h3>
                 <!-- Interactive map for selecting location -->
-                <p
-                    style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    Note: Pin the place on the map to auto-fill latitude and longitude.
-                </p>
                 <div id="map" class="map-container"></div>
                 <form id="predict-form" onsubmit="submitPrediction(event)" novalidate>
                     <div class="grid-3" style="margin-top: 20px;">
                         <div class="form-group">
                             <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
-                            <input type="number" step="any" name="latitude" value="" placeholder="Auto-filled from map"
-                                required readonly oninvalid="this.setCustomValidity('Please enter latitude')"
+                            <input type="number" step="any" name="latitude" value="12.9716" required
+                                oninvalid="this.setCustomValidity('Please enter latitude')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
-                            <input type="number" step="any" name="longitude" value="" placeholder="Auto-filled from map"
-                                required readonly oninvalid="this.setCustomValidity('Please enter longitude')"
+                            <input type="number" step="any" name="longitude" value="77.5946" required
+                                oninvalid="this.setCustomValidity('Please enter longitude')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
@@ -485,9 +448,8 @@
                             <select name="priority" required
                                 oninvalid="this.setCustomValidity('Please select priority')"
                                 oninput="setCustomValidity('')">
-                                <option value="" disabled selected>Select priority</option>
                                 <option value="High">High</option>
-                                <option value="Medium">Medium</option>
+                                <option value="Medium" selected>Medium</option>
                                 <option value="Low">Low</option>
                             </select>
                         </div>
@@ -495,13 +457,13 @@
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
-                            <input type="text" name="junction" value="" placeholder="e.g., Kempapura Junction" required
+                            <input type="text" name="junction" value="Kempapura Junction" required
                                 oninvalid="this.setCustomValidity('Please enter the junction')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
-                            <input type="text" name="corridor" value="" placeholder="e.g., Outer Ring Road" required
+                            <input type="text" name="corridor" value="Outer Ring Road" required
                                 oninvalid="this.setCustomValidity('Please enter the corridor')"
                                 oninput="setCustomValidity('')">
                         </div>
@@ -510,31 +472,30 @@
                             <select name="event_type" required
                                 oninvalid="this.setCustomValidity('Please select event type')"
                                 oninput="setCustomValidity('')">
-                                <option value="" disabled selected>Select event type</option>
                                 <option value="accident">Accident</option>
                                 <option value="roadworks">Roadworks</option>
                                 <option value="procession">Procession</option>
-                                <option value="unplanned">Unplanned Congestion</option>
+                                <option value="unplanned" selected>Unplanned Congestion</option>
                             </select>
                         </div>
                     </div>
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Why did this happen? (ಕಾರಣ)</label>
-                            <input type="text" name="event_cause" value="" placeholder="e.g., vehicle breakdown"
-                                required oninvalid="this.setCustomValidity('Please describe the cause')"
+                            <input type="text" name="event_cause" value="vehicle_breakdown" required
+                                oninvalid="this.setCustomValidity('Please describe the cause')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
-                            <input type="datetime-local" name="start_datetime" value="" required
+                            <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required
                                 oninvalid="this.setCustomValidity('Please enter start date and time')"
                                 oninput="setCustomValidity('')">
                         </div>
                     </div>
                     <div id="form-error" class="error"
                         style="color: var(--accent-red); display:none; margin-bottom:8px;"></div>
-                    <button type="submit" class="btn">Generate Traffic Plan</button>
+                    <button type="submit" class="btn" style="display:block;width:100%;">Generate Traffic Plan</button>
 
                 </form>
             </div>
@@ -765,6 +726,83 @@
     </div>
 
     <script>
+        // Map Globals & Configurations
+        let hotspotMap = null;
+        let predictMap = null;
+        let predictMarker = null;
+
+        const BENGALURU_CENTER = [12.9716, 77.5946];
+        const HOTSPOTS_DATA = [
+            { id: "Cluster 0", lat: 12.983, lon: 77.610, count: 312, risk: "Critical" },
+            { id: "Cluster 1", lat: 12.954, lon: 77.582, count: 125, risk: "Moderate" },
+            { id: "Cluster 2", lat: 13.011, lon: 77.625, count: 84, risk: "Low" }
+        ];
+
+        function initHotspotMap() {
+            if (hotspotMap) {
+                setTimeout(() => hotspotMap.invalidateSize(), 100);
+                return;
+            }
+            hotspotMap = L.map('hotspot-map').setView(BENGALURU_CENTER, 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> & CARTO',
+                maxZoom: 20
+            }).addTo(hotspotMap);
+
+            HOTSPOTS_DATA.forEach(hotspot => {
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                const circle = L.circle([hotspot.lat, hotspot.lon], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.4,
+                    radius: 500
+                }).addTo(hotspotMap);
+                circle.bindPopup(`<b>${hotspot.id} (${hotspot.risk})</b><br>Incidents: ${hotspot.count}<br>Centroid: ${hotspot.lat}, ${hotspot.lon}`);
+            });
+        }
+
+        function initPredictMap() {
+            if (predictMap) {
+                setTimeout(() => predictMap.invalidateSize(), 100);
+                return;
+            }
+            predictMap = L.map('predict-map').setView(BENGALURU_CENTER, 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap & CARTO',
+                maxZoom: 20
+            }).addTo(predictMap);
+
+            HOTSPOTS_DATA.forEach(hotspot => {
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                L.circle([hotspot.lat, hotspot.lon], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.15,
+                    radius: 500
+                }).addTo(predictMap);
+            });
+
+            predictMarker = L.marker(BENGALURU_CENTER, { draggable: true }).addTo(predictMap);
+
+            function updateFormCoordinates(lat, lng) {
+                document.getElementById('input-latitude').value = lat.toFixed(6);
+                document.getElementById('input-longitude').value = lng.toFixed(6);
+            }
+
+            predictMap.on('click', function (e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                predictMarker.setLatLng(e.latlng);
+                updateFormCoordinates(lat, lng);
+            });
+
+            predictMarker.on('dragend', function (e) {
+                const lat = predictMarker.getLatLng().lat;
+                const lng = predictMarker.getLatLng().lng;
+                updateFormCoordinates(lat, lng);
+            });
+        }
+
         // Set live time updates
         setInterval(() => {
             document.getElementById('live-time').innerText = new Date().toLocaleString();
@@ -820,9 +858,9 @@
                 loadHotspots();
             } else if (pageId === 'dashboard') {
                 loadDashboardKPIs();
+                initHotspotMap();
             } else if (pageId === 'predict') {
-                // Initialize map when predict page is shown
-                initMap();
+                initPredictMap();
             }
         }
 
@@ -896,22 +934,6 @@
 
         function submitPrediction(e) {
             e.preventDefault();
-            // Validation for required fields
-            const lat = e.target.latitude.value.trim();
-            const lon = e.target.longitude.value.trim();
-            const start = e.target.start_datetime.value.trim();
-            const errorEl = document.getElementById('form-error');
-            if (!lat) { errorEl.innerText = 'Please enter latitude'; errorEl.style.display = 'block'; return; }
-            if (!lon) { errorEl.innerText = 'Please enter longitude'; errorEl.style.display = 'block'; return; }
-            if (!start) { errorEl.innerText = 'Please enter start date and time'; errorEl.style.display = 'block'; return; }
-            // Additional required fields validation
-            if (!e.target.priority.value) { errorEl.innerText = 'Please select priority'; errorEl.style.display = 'block'; return; }
-            if (!e.target.junction.value.trim()) { errorEl.innerText = 'Please enter the junction'; errorEl.style.display = 'block'; return; }
-            if (!e.target.corridor.value.trim()) { errorEl.innerText = 'Please enter the corridor'; errorEl.style.display = 'block'; return; }
-            if (!e.target.event_type.value) { errorEl.innerText = 'Please select event type'; errorEl.style.display = 'block'; return; }
-            if (!e.target.event_cause.value.trim()) { errorEl.innerText = 'Please describe the cause'; errorEl.style.display = 'block'; return; }
-            errorEl.style.display = 'none';
-            errorEl.style.display = 'none';
             const formData = new FormData(e.target);
             const data = {};
             formData.forEach((value, key) => {
@@ -921,7 +943,6 @@
                     data[key] = value;
                 }
             });
-
 
             // Temporary loading state
             document.getElementById('results-card').style.display = 'block';
