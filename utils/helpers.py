@@ -10,8 +10,11 @@ def get_workspace_dir():
 
 def get_data_path():
     """Return the path to the dataset CSV.
-    By default it expects a file named 'sample_dataset.csv' inside a 'data' folder at the project root.
+    Looks for the anonymized CSV in the project root or falls back to 'data/sample_dataset.csv'.
     """
+    anonymized_path = os.path.join(get_workspace_dir(), "Astram event data_anonymized - Astram event data_anonymizedb40ac87.csv")
+    if os.path.exists(anonymized_path):
+        return anonymized_path
     return os.path.join(get_workspace_dir(), "data", "sample_dataset.csv")
 
 def setup_logger(name="traffic_ml"):
