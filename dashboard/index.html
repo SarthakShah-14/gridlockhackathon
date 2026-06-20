@@ -8,11 +8,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
         rel="stylesheet">
-        <!-- Leaflet CSS -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <!-- Leaflet JS -->
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
         :root {
             --bg-color: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
@@ -51,6 +51,12 @@
             padding: 24px;
             position: fixed;
             height: 100vh;
+            transition: transform 0.3s ease, width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
         }
 
         .brand {
@@ -99,6 +105,11 @@
             flex-grow: 1;
             padding: 40px;
             overflow-y: auto;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
         }
 
         header {
@@ -201,6 +212,7 @@
             font-family: inherit;
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            color-scheme: dark;
         }
 
         input:focus,
@@ -208,6 +220,14 @@
             outline: none;
             border-color: var(--accent-cyan);
             box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        input[readonly] {
+            background-color: rgba(30, 41, 59, 0.5);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border-style: dashed;
+            opacity: 0.7;
         }
 
         .btn {
@@ -221,11 +241,58 @@
             font-size: 1rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+            width: 100%;
+            display: block;
+            text-align: center;
+            box-sizing: border-box;
         }
 
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+
+        /* Responsive Layout */
+        .hamburger {
+            display: block;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%) !important;
+            }
         }
 
         /* Predict outputs display */
@@ -320,7 +387,17 @@
     <!-- Main Panel -->
     <div class="main-content">
         <header>
-            <h1 id="page-title">Operational Dashboard</h1>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="hamburger" onclick="toggleSidebar()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </div>
+                <h1 id="page-title">Operational Dashboard</h1>
+            </div>
             <div style="font-size: 0.9rem; color: var(--text-muted);" id="live-time"></div>
         </header>
 
@@ -375,24 +452,42 @@
         <!-- Subpage: Predict -->
         <div id="predict" class="subpage">
             <div class="glass-card">
-                <h3>Submit Live Incident Details</h3>
+                <h3
+                    style="background: linear-gradient(135deg, #06b6d4, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 24px; font-size: 1.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: inline-block; width: 100%;">
+                    Submit Live Incident Details</h3>
                 <!-- Interactive map for selecting location -->
+                <p
+                    style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Note: Pin the place on the map to auto-fill latitude and longitude.
+                </p>
                 <div id="map" class="map-container"></div>
                 <form id="predict-form" onsubmit="submitPrediction(event)" novalidate>
                     <div class="grid-3" style="margin-top: 20px;">
                         <div class="form-group">
                             <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
-                            <input type="number" step="any" name="latitude" value="12.9716" required oninvalid="this.setCustomValidity('Please enter latitude')" oninput="setCustomValidity('')">
+                            <input type="number" step="any" name="latitude" value="" placeholder="Auto-filled from map"
+                                required readonly oninvalid="this.setCustomValidity('Please enter latitude')"
+                                oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
-                            <input type="number" step="any" name="longitude" value="77.5946" required oninvalid="this.setCustomValidity('Please enter longitude')" oninput="setCustomValidity('')">
+                            <input type="number" step="any" name="longitude" value="" placeholder="Auto-filled from map"
+                                required readonly oninvalid="this.setCustomValidity('Please enter longitude')"
+                                oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>How urgent is the incident? (ಮುಖ್ಯತೆ)</label>
-                            <select name="priority" required oninvalid="this.setCustomValidity('Please select priority')" oninput="setCustomValidity('')">
+                            <select name="priority" required
+                                oninvalid="this.setCustomValidity('Please select priority')"
+                                oninput="setCustomValidity('')">
+                                <option value="" disabled selected>Select priority</option>
                                 <option value="High">High</option>
-                                <option value="Medium" selected>Medium</option>
+                                <option value="Medium">Medium</option>
                                 <option value="Low">Low</option>
                             </select>
                         </div>
@@ -400,34 +495,46 @@
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
-                            <input type="text" name="junction" value="Kempapura Junction" required oninvalid="this.setCustomValidity('Please enter the junction')" oninput="setCustomValidity('')">
+                            <input type="text" name="junction" value="" placeholder="e.g., Kempapura Junction" required
+                                oninvalid="this.setCustomValidity('Please enter the junction')"
+                                oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
-                            <input type="text" name="corridor" value="Outer Ring Road" required oninvalid="this.setCustomValidity('Please enter the corridor')" oninput="setCustomValidity('')">
+                            <input type="text" name="corridor" value="" placeholder="e.g., Outer Ring Road" required
+                                oninvalid="this.setCustomValidity('Please enter the corridor')"
+                                oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>What type of event is it? (ಘಟನೆ ಪ್ರಕಾರ)</label>
-                            <select name="event_type" required oninvalid="this.setCustomValidity('Please select event type')" oninput="setCustomValidity('')">
+                            <select name="event_type" required
+                                oninvalid="this.setCustomValidity('Please select event type')"
+                                oninput="setCustomValidity('')">
+                                <option value="" disabled selected>Select event type</option>
                                 <option value="accident">Accident</option>
                                 <option value="roadworks">Roadworks</option>
                                 <option value="procession">Procession</option>
-                                <option value="unplanned" selected>Unplanned Congestion</option>
+                                <option value="unplanned">Unplanned Congestion</option>
                             </select>
                         </div>
                     </div>
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Why did this happen? (ಕಾರಣ)</label>
-                            <input type="text" name="event_cause" value="vehicle_breakdown" required oninvalid="this.setCustomValidity('Please describe the cause')" oninput="setCustomValidity('')">
+                            <input type="text" name="event_cause" value="" placeholder="e.g., vehicle breakdown"
+                                required oninvalid="this.setCustomValidity('Please describe the cause')"
+                                oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
-                            <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required oninvalid="this.setCustomValidity('Please enter start date and time')" oninput="setCustomValidity('')">
+                            <input type="datetime-local" name="start_datetime" value="" required
+                                oninvalid="this.setCustomValidity('Please enter start date and time')"
+                                oninput="setCustomValidity('')">
                         </div>
                     </div>
-                                        <div id="form-error" class="error" style="color: var(--accent-red); display:none; margin-bottom:8px;"></div>
-                    <button type="submit" class="btn" style="display:block;width:100%;">Generate Traffic Plan</button>
+                    <div id="form-error" class="error"
+                        style="color: var(--accent-red); display:none; margin-bottom:8px;"></div>
+                    <button type="submit" class="btn">Generate Traffic Plan</button>
 
                 </form>
             </div>
@@ -437,7 +544,7 @@
                 <h3>Incident Summary</h3>
                 <select id="lang-toggle" style="margin-bottom: 12px;">
                     <option value="en">English</option>
-                    <option value="kn">Bengaluru (Kannada)</option>
+                    <option value="kn">Kannada</option>
                 </select>
                 <div class="timeline">
                     <div class="timeline-step">
@@ -514,8 +621,8 @@
                 </div>
 
                 <div style="margin-top: 24px; display: flex; gap: 16px;">
-                    <a href="/api/download_pdf" class="btn"
-                        style="text-decoration: none; display: inline-block;">Download Incident Report (PDF)</a>
+                    <a href="/api/download_pdf" class="btn" style="text-decoration: none;">Download Incident Report
+                        (PDF)</a>
                 </div>
             </div>
         </div>
@@ -663,7 +770,20 @@
             document.getElementById('live-time').innerText = new Date().toLocaleString();
         }, 1000);
 
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.toggle('open');
+            } else {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+                document.querySelector('.main-content').classList.toggle('expanded');
+            }
+        }
+
         function showPage(pageId) {
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.remove('open');
+            }
             // Hide all subpages
             document.querySelectorAll('.subpage').forEach(page => {
                 page.classList.remove('active');
@@ -674,7 +794,7 @@
             // Toggle sidebar active link style
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
-                if (item.innerText.toLowerCase().includes(pageId.substring(0, 5))) {
+                if (item.getAttribute('onclick').includes(`showPage('${pageId}')`)) {
                     item.classList.add('active');
                 }
             });
@@ -878,8 +998,8 @@
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
             let marker;
-            map.on('click', function(e) {
-                const {lat, lng} = e.latlng;
+            map.on('click', function (e) {
+                const { lat, lng } = e.latlng;
                 if (marker) marker.setLatLng(e.latlng);
                 else marker = L.marker(e.latlng).addTo(map);
                 const latInput = document.querySelector('input[name="latitude"]');
@@ -888,7 +1008,7 @@
                 if (lngInput) lngInput.value = lng.toFixed(6);
             });
         }
-        
+
 
     </script>
 </body>
