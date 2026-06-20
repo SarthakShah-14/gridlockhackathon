@@ -370,7 +370,6 @@
         <ul class="nav-links">
             <li class="nav-item active" onclick="showPage('dashboard')">What do you want to check today?</li>
             <li class="nav-item" onclick="showPage('predict')">Shall we plan a new traffic event?</li>
-            <li class="nav-item" onclick="showPage('analytics')">Where are the current hotspots?</li>
             <li class="nav-item" onclick="showPage('performance')">How is the model performing?</li>
             <li class="nav-item" onclick="showPage('explain')">Explain the prediction?</li>
             <li class="nav-item" onclick="showPage('monitoring')">View system logs?</li>
@@ -441,6 +440,42 @@
             </div>
             <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error
                 loading hotspots. ದಯವಿಟ್ಟು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</p>
+
+            <div class="glass-card">
+                <h3> बेंगलुरु Density Cluster Mapping (DBSCAN)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">DBSCAN clustering parses high-risk spatial
+                    anomalies. Epsilon optimized using k-distance.</p>
+                <table id="clusters-table">
+                    <thead>
+                        <tr>
+                            <th>Cluster ID</th>
+                            <th>Total Incidents in Region</th>
+                            <th>Avg Coordinates (Centroid)</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cluster 0</td>
+                            <td>312 incidents</td>
+                            <td>12.983, 77.610</td>
+                            <td><span style="color: var(--accent-red); font-weight: bold;">Critical</span></td>
+                        </tr>
+                        <tr>
+                            <td>Cluster 1</td>
+                            <td>125 incidents</td>
+                            <td>12.954, 77.582</td>
+                            <td><span style="color: var(--accent-cyan); font-weight: bold;">Moderate</span></td>
+                        </tr>
+                        <tr>
+                            <td>Cluster 2</td>
+                            <td>84 incidents</td>
+                            <td>13.011, 77.625</td>
+                            <td><span style="color: var(--text-muted);">Low</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Subpage: Predict -->
@@ -575,16 +610,17 @@
                                         style="color: var(--accent-cyan); font-weight: bold;">0.00%</span> (Confidence:
                                     <span id="out-conf">90%</span>)</span><br /><span class="kn"
                                     style="display:none;">ಮಾಡೆಲ್ ರಸ್ತೆಯ ಮುಚ್ಚುವ ಸಾಧ್ಯತೆಯನ್ನು <span
-                                        id="out-closure">0.00%</span> (ವಿಶ್ವಾಸ ಮಟ್ಟ <span id="out-conf">90%</span>) ಎಂದು
+                                        id="out-closure-kn">0.00%</span> (ವಿಶ್ವಾಸ ಮಟ್ಟ <span
+                                        id="out-conf-kn">90%</span>) ಎಂದು
                                     ಮುನ್ಸೂಚಿಸುತ್ತದೆ.</span></p>
                             <p><span class="en"><strong>Clearance Duration:</strong> <span id="out-duration"
                                         style="color: var(--accent-cyan); font-weight: bold;">0.0 mins</span> (range:
                                     <span id="out-range">0-0 mins</span>)</span><br /><span class="kn"
-                                    style="display:none;">ಸುದ್ದಿ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಅವಧಿ <span id="out-duration">0.0
-                                        mins</span> (ರೇಂಜ್ <span id="out-range">0-0 mins</span>).</span></p>
+                                    style="display:none;">ಸುದ್ದಿ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಅವಧಿ <span id="out-duration-kn">0.0
+                                        mins</span> (ರೇಂಜ್ <span id="out-range-kn">0-0 mins</span>).</span></p>
                             <p><span class="en"><strong>Severity:</strong> <span id="out-severity"
                                         style="font-weight: bold;">N/A</span></span><br /><span class="kn"
-                                    style="display:none;">ಮಹತ್ವ ಮಟ್ಟ: <span id="out-severity">N/A</span></span></p>
+                                    style="display:none;">ಮಹತ್ವ ಮಟ್ಟ: <span id="out-severity-kn">N/A</span></span></p>
                         </div>
                     </div>
                     <div class="timeline-step">
@@ -595,7 +631,8 @@
                             <p><strong>Expected Congestion:</strong> <span id="out-congestion"
                                     style="color: var(--accent-cyan); font-weight: bold;">0.0 / 100</span> (Level: <span
                                     id="out-risk" style="font-weight: bold;">N/A</span>)<br />ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್
-                                <span id="out-congestion">0.0 / 100</span>, ಇದು <span id="out-risk">N/A</span> ಮಟ್ಟಕ್ಕೆ
+                                <span id="out-congestion-kn">0.0 / 100</span>, ಇದು <span id="out-risk-kn">N/A</span>
+                                ಮಟ್ಟಕ್ಕೆ
                                 ಸೇರಿದವಾಗಿದೆ.
                             </p>
                         </div>
@@ -610,7 +647,7 @@
                                 bounded [2, 10])<br />Barricades: <span id="out-barricades">0 units</span> | Traffic
                                 Cones: <span id="out-cones">5 units</span><br />Teams / Vehicles: <span id="out-teams">0
                                     diversion teams</span> | <span id="out-vehicles">1 patrol vehicle</span><br />ನಾವು
-                                <span id="out-officers">2 ಅಧಿಕಾರಿಗಳು</span> ಮತ್ತು ಇತರೆ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವೆವು.
+                                <span id="out-officers-kn">2 ಅಧಿಕಾರಿಗಳು</span> ಮತ್ತು ಇತರೆ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವೆವು.
                             </p>
                         </div>
                     </div>
@@ -623,8 +660,9 @@
                                     style="font-weight: bold; color: var(--accent-green);">None</span>, Corridor <span
                                     id="out-alt-corr">None</span> (Expected reduction: <span
                                     id="out-reduction">0.0%</span>)<br />ಪರ್ಯಾಯ ಮಾರ್ಗ: ಜಂಕ್ಷನ್ <span
-                                    id="out-alt-junc">None</span>, ಕಾರಿಡಾರ್ <span id="out-alt-corr">None</span> (ಕಡಿತ:
-                                <span id="out-reduction">0.0%</span>)
+                                    id="out-alt-junc-kn">None</span>, ಕಾರಿಡಾರ್ <span id="out-alt-corr-kn">None</span>
+                                (ಕಡಿತ:
+                                <span id="out-reduction-kn">0.0%</span>)
                             </p>
                         </div>
                     </div>
@@ -643,45 +681,6 @@
                     <a href="/api/download_pdf" class="btn" style="text-decoration: none;">Download Incident Report
                         (PDF)</a>
                 </div>
-            </div>
-        </div>
-
-        <!-- Subpage: Hotspot Analysis -->
-        <div id="analytics" class="subpage">
-            <div class="glass-card">
-                <h3> बेंगलुरु Density Cluster Mapping (DBSCAN)</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">DBSCAN clustering parses high-risk spatial
-                    anomalies. Epsilon optimized using k-distance.</p>
-                <table id="clusters-table">
-                    <thead>
-                        <tr>
-                            <th>Cluster ID</th>
-                            <th>Total Incidents in Region</th>
-                            <th>Avg Coordinates (Centroid)</th>
-                            <th>Risk Level</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Cluster 0</td>
-                            <td>312 incidents</td>
-                            <td>12.983, 77.610</td>
-                            <td><span style="color: var(--accent-red); font-weight: bold;">Critical</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cluster 1</td>
-                            <td>125 incidents</td>
-                            <td>12.954, 77.582</td>
-                            <td><span style="color: var(--accent-cyan); font-weight: bold;">Moderate</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cluster 2</td>
-                            <td>84 incidents</td>
-                            <td>13.011, 77.625</td>
-                            <td><span style="color: var(--text-muted);">Low</span></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
@@ -726,6 +725,31 @@
                             style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
                             <li>No active prediction</li>
                         </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 32px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">Global
+                    Model SHAP Summaries</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Overall feature impact across all historical
+                    incidents in Bengaluru.</p>
+                <div class="grid-3">
+                    <div class="glass-card" style="padding: 12px;">
+                        <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent-cyan);">Road Closure
+                            Model</h4>
+                        <img src="/api/reports/shap_summary_road_closure.png" alt="Road Closure SHAP"
+                            style="width: 100%; border-radius: 8px; filter: invert(0.9) hue-rotate(180deg);">
+                    </div>
+                    <div class="glass-card" style="padding: 12px;">
+                        <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent-cyan);">Incident
+                            Duration Model</h4>
+                        <img src="/api/reports/shap_summary_duration.png" alt="Duration SHAP"
+                            style="width: 100%; border-radius: 8px; filter: invert(0.9) hue-rotate(180deg);">
+                    </div>
+                    <div class="glass-card" style="padding: 12px;">
+                        <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent-cyan);">Congestion Model
+                        </h4>
+                        <img src="/api/reports/shap_summary_congestion.png" alt="Congestion SHAP"
+                            style="width: 100%; border-radius: 8px; filter: invert(0.9) hue-rotate(180deg);">
                     </div>
                 </div>
             </div>
@@ -916,7 +940,6 @@
             const titles = {
                 'dashboard': 'Operational Dashboard',
                 'predict': 'Predict Event & Recommendations',
-                'analytics': ' Bengaluru Density Cluster Mapping (DBSCAN)',
                 'performance': 'Experiment Benchmarks & Performance',
                 'explain': 'Explainable AI & Contributors',
                 'monitoring': 'Prediction logs & System Monitoring',
@@ -929,11 +952,12 @@
                 loadPerformanceData();
             } else if (pageId === 'monitoring') {
                 loadMonitoringData();
-            } else if (pageId === 'analytics') {
-                loadHotspots();
             } else if (pageId === 'dashboard') {
                 loadDashboardKPIs();
                 initHotspotMap();
+                if (typeof loadHotspots === 'function') {
+                    loadHotspots();
+                }
             } else if (pageId === 'predict') {
                 initPredictMap();
             }
@@ -1044,23 +1068,30 @@
             })
                 .then(res => res.json())
                 .then(resData => {
-                    document.getElementById('out-closure').innerText = (resData.road_closure_prob * 100).toFixed(2) + '%';
-                    document.getElementById('out-conf').innerText = resData.confidence_score.toFixed(1) + '%';
-                    document.getElementById('out-duration').innerText = resData.predicted_duration.toFixed(1) + ' mins';
-                    document.getElementById('out-range').innerText = resData.duration_min_bound.toFixed(1) + ' - ' + resData.duration_max_bound.toFixed(1) + ' mins';
-                    document.getElementById('out-severity').innerText = resData.predicted_severity;
-                    document.getElementById('out-congestion').innerText = resData.congestion_score.toFixed(1) + ' / 100';
-                    document.getElementById('out-risk').innerText = resData.risk_level;
+                    const setVal = (id, val, knVal) => {
+                        const el = document.getElementById(id);
+                        if (el) el.innerText = val;
+                        const elKn = document.getElementById(id + '-kn');
+                        if (elKn) elKn.innerText = (knVal !== undefined) ? knVal : val;
+                    };
 
-                    document.getElementById('out-officers').innerText = resData.officers_required + ' Officers';
+                    setVal('out-closure', (resData.road_closure_prob * 100).toFixed(2) + '%');
+                    setVal('out-conf', resData.confidence_score.toFixed(1) + '%');
+                    setVal('out-duration', resData.predicted_duration.toFixed(1) + ' mins');
+                    setVal('out-range', resData.duration_min_bound.toFixed(1) + ' - ' + resData.duration_max_bound.toFixed(1) + ' mins');
+                    setVal('out-severity', resData.predicted_severity);
+                    setVal('out-congestion', resData.congestion_score.toFixed(1) + ' / 100');
+                    setVal('out-risk', resData.risk_level);
+
+                    setVal('out-officers', resData.officers_required + ' Officers', resData.officers_required + ' ಅಧಿಕಾರಿಗಳು');
                     document.getElementById('out-barricades').innerText = resData.barricades_required + ' units';
                     document.getElementById('out-cones').innerText = resData.traffic_cones_required + ' units';
                     document.getElementById('out-teams').innerText = resData.diversion_teams_required + ' diversion teams';
                     document.getElementById('out-vehicles').innerText = resData.patrol_vehicles_required + ' patrol vehicles';
 
-                    document.getElementById('out-alt-junc').innerText = resData.alternative_junction;
-                    document.getElementById('out-alt-corr').innerText = resData.alternative_corridor;
-                    document.getElementById('out-reduction').innerText = resData.congestion_reduction.toFixed(1) + '%';
+                    setVal('out-alt-junc', resData.alternative_junction);
+                    setVal('out-alt-corr', resData.alternative_corridor);
+                    setVal('out-reduction', resData.congestion_reduction.toFixed(1) + '%');
 
                     document.getElementById('out-narrative').innerText = resData.explanation_narrative;
 

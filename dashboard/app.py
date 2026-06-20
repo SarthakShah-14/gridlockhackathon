@@ -52,22 +52,16 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/api/monitoring':
             self.serve_json_file(os.path.join("models", "monitoring_metrics.json"))
         elif self.path == '/api/history':
-            from utils.db import fetch_prediction_history
-            logs = fetch_prediction_history()
-            if logs is not None:
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps(logs).encode('utf-8'))
-            else:
-                self.serve_json_file(os.path.join("models", "prediction_logs.json"))
-
+            self.serve_json_file(os.path.join("models", "prediction_logs.json"))
         elif self.path == '/api/experiment':
             self.serve_json_file(os.path.join("models", "experiment_history.json"))
         elif self.path == '/api/download_pdf':
             self.serve_pdf_file(os.path.join("reports", "operational_incident_report.pdf"))
         elif self.path == '/api/download_csv':
             self.generate_and_serve_csv(os.path.join("models", "prediction_logs.json"))
+        elif self.path.startswith('/api/reports/'):
+            filename = urllib.parse.unquote(os.path.basename(self.path))
+            self.serve_image_file(os.path.join("reports", filename))
         else:
             # Fallback to serving static html
             super().do_GET()
@@ -97,24 +91,27 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             
+    def serve_image_file(self, filepath):
+        if os.path.exists(filepath):
+            self.send_response(200)
+            if filepath.endswith('.png'):
+                self.send_header('Content-type', 'image/png')
+            elif filepath.endswith('.jpg') or filepath.endswith('.jpeg'):
+                self.send_header('Content-type', 'image/jpeg')
+            self.end_headers()
+            with open(filepath, 'rb') as f:
+                self.wfile.write(f.read())
+        else:
+            self.send_response(404)
+            self.end_headers()
+            
     def generate_and_serve_csv(self, logs_filepath):
-        from utils.db import fetch_prediction_history
-        logs = fetch_prediction_history()
-        
-        # If DB logs aren't available, fall back to local file
-        if logs is None:
-            if os.path.exists(logs_filepath):
-                try:
-                    with open(logs_filepath, 'r') as f:
-                        logs = json.load(f)
-                except Exception:
-                    logs = []
-            else:
-                logs = []
-                
-        if logs:
+        if os.path.exists(logs_filepath):
             try:
+                with open(logs_filepath, 'r') as f:
+                    logs = json.load(f)
                 df = pd.DataFrame(logs)
+                
                 csv_data = df.to_csv(index=False)
                 
                 self.send_response(200)
@@ -128,7 +125,6 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
-
 
 def run(port=PORT):
     # Ensure static HTML is placed correctly
