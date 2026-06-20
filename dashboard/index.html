@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bengaluru Event-Driven Traffic Decision Support Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -78,7 +83,8 @@
             gap: 12px;
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-item:hover,
+        .nav-item.active {
             background: rgba(30, 41, 59, 0.9);
             color: var(--text-main);
             box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.15);
@@ -118,8 +124,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Glassmorphism Cards */
@@ -168,7 +181,8 @@
             color: var(--text-muted);
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 12px;
             background: rgba(15, 23, 42, 0.6);
@@ -180,7 +194,8 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: var(--accent-cyan);
             box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
@@ -256,7 +271,8 @@
             font-size: 0.95rem;
         }
 
-        th, td {
+        th,
+        td {
             padding: 14px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
@@ -275,6 +291,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar Menu -->
@@ -314,79 +331,76 @@
                     <div class="kpi-value" id="kpi-drift" style="color: var(--accent-green);">No Drift</div>
                 </div>
             </div>
-            
+
             <div class="glass-card">
                 <h3>Bengaluru Hotspots (DBSCAN)</h3>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">Hotspots from dense incident clusters.</p>
-                <div style="height: 350px; background: rgba(15, 23, 42, 0.5); border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <!-- Simple Mockup Grid visualization of Bengaluru hotspots -->
-                    <div style="width: 80%; height: 80%; display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); gap: 2px;">
-                        <!-- Highlighted active hotspots coordinates -->
-                        <div style="grid-column: 5; grid-row: 4; background: var(--accent-red); border-radius: 50%; filter: blur(4px);"></div>
-                        <div style="grid-column: 7; grid-row: 6; background: var(--accent-red); border-radius: 50%; filter: blur(4px);"></div>
-                        <div style="grid-column: 4; grid-row: 7; background: var(--accent-red); border-radius: 50%; filter: blur(4px);"></div>
-                        <div style="grid-column: 6; grid-row: 5; background: var(--accent-green); border-radius: 50%; filter: blur(4px);"></div>
-                    </div>
-                    <div style="position: absolute; bottom: 12px; left: 12px; font-size: 0.8rem; color: var(--text-muted);">Coordinates mapping Bengaluru center (12.97, 77.59)</div>
-                </div>
+                <div id="hotspot-map" style="height: 400px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 1; background: rgba(15, 23, 42, 0.5);"></div>
             </div>
-                <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error loading hotspots. ದಯವಿಟ್ಟು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</p>
+            <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error
+                loading hotspots. ದಯವಿಟ್ಟು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</p>
         </div>
 
         <!-- Subpage: Predict -->
         <div id="predict" class="subpage">
             <div class="glass-card">
                 <h3>Submit Live Incident Details</h3>
-                <form id="predict-form" onsubmit="submitPrediction(event)">
-                    <div class="grid-3" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
-                            <input type="number" step="any" name="latitude" value="12.9716" required>
+                <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 20px;">
+                    <form id="predict-form" onsubmit="submitPrediction(event)" style="flex: 1.5; min-width: 320px;">
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
+                                <input type="number" step="any" name="latitude" id="input-latitude" value="12.9716" required>
+                            </div>
+                            <div class="form-group">
+                                <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
+                                <input type="number" step="any" name="longitude" id="input-longitude" value="77.5946" required>
+                            </div>
+                            <div class="form-group">
+                                <label>How urgent is the incident, sir? (ಮುಖ್ಯತೆ)</label>
+                                <select name="priority">
+                                    <option value="High">High</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
-                            <input type="number" step="any" name="longitude" value="77.5946" required>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
+                                <input type="text" name="junction" value="Kempapura Junction" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
+                                <input type="text" name="corridor" value="Outer Ring Road" required>
+                            </div>
+                            <div class="form-group">
+                                <label>What type of event is it? (ಘಟನೆ ಪ್ರಕಾರ)</label>
+                                <select name="event_type">
+                                    <option value="accident">Accident</option>
+                                    <option value="roadworks">Roadworks</option>
+                                    <option value="procession">Procession</option>
+                                    <option value="unplanned" selected>Unplanned Congestion</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>How urgent is the incident, sir? (ಮುಖ್ಯತೆ)</label>
-                            <select name="priority">
-                                <option value="High">High</option>
-                                <option value="Medium" selected>Medium</option>
-                                <option value="Low">Low</option>
-                            </select>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Why did this happen? (ಕಾರಣ)</label>
+                                <input type="text" name="event_cause" value="vehicle_breakdown" required>
+                            </div>
+                            <div class="form-group">
+                                <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
+                                <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required>
+                            </div>
                         </div>
+                        <button type="submit" class="btn">Shall we generate a traffic plan, sir?</button>
+                    </form>
+                    <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-weight: 600; color: var(--text-muted);">Click on map to select incident location:</label>
+                        <div id="predict-map" style="flex-grow: 1; min-height: 350px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 1; background: rgba(15, 23, 42, 0.5);"></div>
                     </div>
-                    <div class="grid-3">
-                        <div class="form-group">
-                            <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
-                            <input type="text" name="junction" value="Kempapura Junction" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
-                            <input type="text" name="corridor" value="Outer Ring Road" required>
-                        </div>
-                        <div class="form-group">
-                            <label>What type of event is it? (ಘಟನೆ ಪ್ರಕಾರ)</label>
-                            <select name="event_type">
-                                <option value="accident">Accident</option>
-                                <option value="roadworks">Roadworks</option>
-                                <option value="procession">Procession</option>
-                                <option value="unplanned" selected>Unplanned Congestion</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid-3">
-                        <div class="form-group">
-                            <label>Why did this happen? (ಕಾರಣ)</label>
-                            <input type="text" name="event_cause" value="vehicle_breakdown" required>
-                        </div>
-                        <div class="form-group">
-                            <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
-                            <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn">Shall we generate a traffic plan, sir?</button>
-                </form>
+                </div>
             </div>
 
             <!-- Prediction results timeline flowchart -->
@@ -400,44 +414,77 @@
                     <div class="timeline-step">
                         <div class="step-num">1</div>
                         <div class="step-content">
-                            <h4><span class="en">What does the model forecast?</span><span class="kn" style="display:none;">ಮಾಡೆಲ್ ಏನು ಮುನ್ಸೂಚಿಸುತ್ತಿದೆ?</span></h4>
-                            <p><span class="en"><strong>Road Closure Forecast:</strong> <span id="out-closure" style="color: var(--accent-cyan); font-weight: bold;">0.00%</span> (Confidence: <span id="out-conf">90%</span>)</span><br/><span class="kn" style="display:none;">ಮಾಡೆಲ್ ರಸ್ತೆಯ ಮುಚ್ಚುವ ಸಾಧ್ಯತೆಯನ್ನು <span id="out-closure">0.00%</span> (ವಿಶ್ವಾಸ ಮಟ್ಟ <span id="out-conf">90%</span>) ಎಂದು ಮುನ್ಸೂಚಿಸುತ್ತದೆ.</span></p>
-                            <p><span class="en"><strong>Clearance Duration:</strong> <span id="out-duration" style="color: var(--accent-cyan); font-weight: bold;">0.0 mins</span> (range: <span id="out-range">0-0 mins</span>)</span><br/><span class="kn" style="display:none;">ಸುದ್ದಿ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಅವಧಿ <span id="out-duration">0.0 mins</span> (ರೇಂಜ್ <span id="out-range">0-0 mins</span>).</span></p>
-                            <p><span class="en"><strong>Severity:</strong> <span id="out-severity" style="font-weight: bold;">N/A</span></span><br/><span class="kn" style="display:none;">ಮಹತ್ವ ಮಟ್ಟ: <span id="out-severity">N/A</span></span></p>
+                            <h4><span class="en">What does the model forecast?</span><span class="kn"
+                                    style="display:none;">ಮಾಡೆಲ್ ಏನು ಮುನ್ಸೂಚಿಸುತ್ತಿದೆ?</span></h4>
+                            <p><span class="en"><strong>Road Closure Forecast:</strong> <span id="out-closure"
+                                        style="color: var(--accent-cyan); font-weight: bold;">0.00%</span> (Confidence:
+                                    <span id="out-conf">90%</span>)</span><br /><span class="kn"
+                                    style="display:none;">ಮಾಡೆಲ್ ರಸ್ತೆಯ ಮುಚ್ಚುವ ಸಾಧ್ಯತೆಯನ್ನು <span
+                                        id="out-closure">0.00%</span> (ವಿಶ್ವಾಸ ಮಟ್ಟ <span id="out-conf">90%</span>) ಎಂದು
+                                    ಮುನ್ಸೂಚಿಸುತ್ತದೆ.</span></p>
+                            <p><span class="en"><strong>Clearance Duration:</strong> <span id="out-duration"
+                                        style="color: var(--accent-cyan); font-weight: bold;">0.0 mins</span> (range:
+                                    <span id="out-range">0-0 mins</span>)</span><br /><span class="kn"
+                                    style="display:none;">ಸುದ್ದಿ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಅವಧಿ <span id="out-duration">0.0
+                                        mins</span> (ರೇಂಜ್ <span id="out-range">0-0 mins</span>).</span></p>
+                            <p><span class="en"><strong>Severity:</strong> <span id="out-severity"
+                                        style="font-weight: bold;">N/A</span></span><br /><span class="kn"
+                                    style="display:none;">ಮಹತ್ವ ಮಟ್ಟ: <span id="out-severity">N/A</span></span></p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">2</div>
                         <div class="step-content">
-                            <h4><span class="en">What congestion level is expected?</span><span class="kn" style="display:none;">ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್ ಮಟ್ಟ ಏನು?</span></h4>
-                            <p><strong>Expected Congestion:</strong> <span id="out-congestion" style="color: var(--accent-cyan); font-weight: bold;">0.0 / 100</span> (Level: <span id="out-risk" style="font-weight: bold;">N/A</span>)<br/>ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್ <span id="out-congestion">0.0 / 100</span>, ಇದು <span id="out-risk">N/A</span> ಮಟ್ಟಕ್ಕೆ ಸೇರಿದವಾಗಿದೆ.</p>
+                            <h4><span class="en">What congestion level is expected?</span><span class="kn"
+                                    style="display:none;">ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್ ಮಟ್ಟ ಏನು?</span></h4>
+                            <p><strong>Expected Congestion:</strong> <span id="out-congestion"
+                                    style="color: var(--accent-cyan); font-weight: bold;">0.0 / 100</span> (Level: <span
+                                    id="out-risk" style="font-weight: bold;">N/A</span>)<br />ಅಪೇಕ್ಷಿತ ಟ್ರಾಫಿಕ್ ಜಾಮ್
+                                <span id="out-congestion">0.0 / 100</span>, ಇದು <span id="out-risk">N/A</span> ಮಟ್ಟಕ್ಕೆ
+                                ಸೇರಿದವಾಗಿದೆ.</p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">3</div>
                         <div class="step-content">
-                            <h4><span class="en">Which resources should we allocate?</span><span class="kn" style="display:none;">ನಾವು ಯಾವ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಬೇಕು?</span></h4>
-                            <p><strong>Allocated Resources:</strong> <span id="out-officers" style="font-weight: bold; color: var(--accent-green);">2 Officers</span> (Staffing bounded [2, 10])<br/>Barricades: <span id="out-barricades">0 units</span> | Traffic Cones: <span id="out-cones">5 units</span><br/>Teams / Vehicles: <span id="out-teams">0 diversion teams</span> | <span id="out-vehicles">1 patrol vehicle</span><br/>ನಾವು <span id="out-officers">2 ಅಧಿಕಾರಿಗಳು</span> ಮತ್ತು ಇತರೆ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವೆವು.</p>
+                            <h4><span class="en">Which resources should we allocate?</span><span class="kn"
+                                    style="display:none;">ನಾವು ಯಾವ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಬೇಕು?</span></h4>
+                            <p><strong>Allocated Resources:</strong> <span id="out-officers"
+                                    style="font-weight: bold; color: var(--accent-green);">2 Officers</span> (Staffing
+                                bounded [2, 10])<br />Barricades: <span id="out-barricades">0 units</span> | Traffic
+                                Cones: <span id="out-cones">5 units</span><br />Teams / Vehicles: <span id="out-teams">0
+                                    diversion teams</span> | <span id="out-vehicles">1 patrol vehicle</span><br />ನಾವು
+                                <span id="out-officers">2 ಅಧಿಕಾರಿಗಳು</span> ಮತ್ತು ಇತರೆ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳುವೆವು.
+                            </p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">4</div>
                         <div class="step-content">
-                            <h4><span class="en">Which alternate route do we recommend?</span><span class="kn" style="display:none;">ನಾವು ಯಾವ ಪರ್ಯಾಯ ಮಾರ್ಗವನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ?</span></h4>
-                            <p><strong>Alternate Route:</strong> Junction <span id="out-alt-junc" style="font-weight: bold; color: var(--accent-green);">None</span>, Corridor <span id="out-alt-corr">None</span> (Expected reduction: <span id="out-reduction">0.0%</span>)<br/>ಪರ್ಯಾಯ ಮಾರ್ಗ: ಜಂಕ್ಷನ್ <span id="out-alt-junc">None</span>, ಕಾರಿಡಾರ್ <span id="out-alt-corr">None</span> (ಕಡಿತ: <span id="out-reduction">0.0%</span>)</p>
+                            <h4><span class="en">Which alternate route do we recommend?</span><span class="kn"
+                                    style="display:none;">ನಾವು ಯಾವ ಪರ್ಯಾಯ ಮಾರ್ಗವನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ?</span></h4>
+                            <p><strong>Alternate Route:</strong> Junction <span id="out-alt-junc"
+                                    style="font-weight: bold; color: var(--accent-green);">None</span>, Corridor <span
+                                    id="out-alt-corr">None</span> (Expected reduction: <span
+                                    id="out-reduction">0.0%</span>)<br />ಪರ್ಯಾಯ ಮಾರ್ಗ: ಜಂಕ್ಷನ್ <span
+                                    id="out-alt-junc">None</span>, ಕಾರಿಡಾರ್ <span id="out-alt-corr">None</span> (ಕಡಿತ:
+                                <span id="out-reduction">0.0%</span>)</p>
                         </div>
                     </div>
                     <div class="timeline-step">
                         <div class="step-num">5</div>
                         <div class="step-content">
-                            <h4><span class="en">Summary of recommended actions</span><span class="kn" style="display:none;">ಶಿಫಾರಸು ಮಾಡಲಾದ ಕ್ರಮಗಳ ಸಂಕ್ಷಿಪ್ತ</span></h4>
-                            <p style="font-style: italic; margin-top: 8px; color: var(--text-muted);" id="out-narrative"></p>
+                            <h4><span class="en">Summary of recommended actions</span><span class="kn"
+                                    style="display:none;">ಶಿಫಾರಸು ಮಾಡಲಾದ ಕ್ರಮಗಳ ಸಂಕ್ಷಿಪ್ತ</span></h4>
+                            <p style="font-style: italic; margin-top: 8px; color: var(--text-muted);"
+                                id="out-narrative"></p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div style="margin-top: 24px; display: flex; gap: 16px;">
-                    <a href="/api/download_pdf" class="btn" style="text-decoration: none; display: inline-block;">Download Incident Report (PDF)</a>
+                    <a href="/api/download_pdf" class="btn"
+                        style="text-decoration: none; display: inline-block;">Download Incident Report (PDF)</a>
                 </div>
             </div>
         </div>
@@ -446,7 +493,8 @@
         <div id="analytics" class="subpage">
             <div class="glass-card">
                 <h3> बेंगलुरु Density Cluster Mapping (DBSCAN)</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">DBSCAN clustering parses high-risk spatial anomalies. Epsilon optimized using k-distance.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">DBSCAN clustering parses high-risk spatial
+                    anomalies. Epsilon optimized using k-distance.</p>
                 <table id="clusters-table">
                     <thead>
                         <tr>
@@ -484,15 +532,16 @@
         <div id="performance" class="subpage">
             <div class="glass-card">
                 <h3>Model Performance Summary</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Key performance metrics for the traffic model.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Key performance metrics for the traffic model.
+                </p>
                 <table>
-                        <thead>
+                    <thead>
                         <tr>
                             <th>Model</th>
                             <th>Accuracy</th>
                             <th>Inference Latency</th>
                         </tr>
-                        </thead>
+                    </thead>
                     <tbody id="performance-tbody">
                         <!-- Loaded dynamically from experiment_history.json -->
                     </tbody>
@@ -504,17 +553,20 @@
         <div id="explain" class="subpage">
             <div class="glass-card">
                 <h3>Explainable AI Dashboard (Local contributors)</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Identifies local feature contributors and SHAP dependencies for the last prediction.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Identifies local feature contributors and SHAP
+                    dependencies for the last prediction.</p>
                 <div class="grid-3">
                     <div class="glass-card" style="background: rgba(16, 185, 129, 0.05);">
                         <h4 style="color: var(--accent-green); margin-bottom: 12px;">Top Positive Contributors</h4>
-                        <ul id="pos-contributors-list" style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                        <ul id="pos-contributors-list"
+                            style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
                             <li>No active prediction</li>
                         </ul>
                     </div>
                     <div class="glass-card" style="background: rgba(239, 68, 68, 0.05);">
                         <h4 style="color: var(--accent-red); margin-bottom: 12px;">Top Negative Contributors</h4>
-                        <ul id="neg-contributors-list" style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                        <ul id="neg-contributors-list"
+                            style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
                             <li>No active prediction</li>
                         </ul>
                     </div>
@@ -526,7 +578,8 @@
         <div id="monitoring" class="subpage">
             <div class="glass-card">
                 <h3>System Monitoring & Prediction Logs</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Real-time memory footprints, prediction latencies, and drift statistics.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Real-time memory footprints, prediction
+                    latencies, and drift statistics.</p>
                 <div class="grid-3">
                     <div class="glass-card">
                         <div class="kpi-title">Average CPU footprint</div>
@@ -537,7 +590,7 @@
                         <div class="kpi-value" id="mon-ram">0.0 MB</div>
                     </div>
                 </div>
-                
+
                 <table id="history-table">
                     <thead>
                         <tr>
@@ -562,9 +615,11 @@
         <div id="reports" class="subpage">
             <div class="glass-card">
                 <h3>Export System Deliverables</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Download generated reports, historical logs, and benchmark parameters.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Download generated reports, historical logs,
+                    and benchmark parameters.</p>
                 <div style="display: flex; gap: 16px;">
-                    <a href="/api/download_csv" class="btn" style="text-decoration: none;">Download Prediction Logs (CSV)</a>
+                    <a href="/api/download_csv" class="btn" style="text-decoration: none;">Download Prediction Logs
+                        (CSV)</a>
                 </div>
             </div>
         </div>
@@ -572,6 +627,83 @@
     </div>
 
     <script>
+        // Map Globals & Configurations
+        let hotspotMap = null;
+        let predictMap = null;
+        let predictMarker = null;
+
+        const BENGALURU_CENTER = [12.9716, 77.5946];
+        const HOTSPOTS_DATA = [
+            { id: "Cluster 0", lat: 12.983, lon: 77.610, count: 312, risk: "Critical" },
+            { id: "Cluster 1", lat: 12.954, lon: 77.582, count: 125, risk: "Moderate" },
+            { id: "Cluster 2", lat: 13.011, lon: 77.625, count: 84, risk: "Low" }
+        ];
+
+        function initHotspotMap() {
+            if (hotspotMap) {
+                setTimeout(() => hotspotMap.invalidateSize(), 100);
+                return;
+            }
+            hotspotMap = L.map('hotspot-map').setView(BENGALURU_CENTER, 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> & CARTO',
+                maxZoom: 20
+            }).addTo(hotspotMap);
+
+            HOTSPOTS_DATA.forEach(hotspot => {
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                const circle = L.circle([hotspot.lat, hotspot.lon], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.4,
+                    radius: 500
+                }).addTo(hotspotMap);
+                circle.bindPopup(`<b>${hotspot.id} (${hotspot.risk})</b><br>Incidents: ${hotspot.count}<br>Centroid: ${hotspot.lat}, ${hotspot.lon}`);
+            });
+        }
+
+        function initPredictMap() {
+            if (predictMap) {
+                setTimeout(() => predictMap.invalidateSize(), 100);
+                return;
+            }
+            predictMap = L.map('predict-map').setView(BENGALURU_CENTER, 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap & CARTO',
+                maxZoom: 20
+            }).addTo(predictMap);
+
+            HOTSPOTS_DATA.forEach(hotspot => {
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                L.circle([hotspot.lat, hotspot.lon], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.15,
+                    radius: 500
+                }).addTo(predictMap);
+            });
+
+            predictMarker = L.marker(BENGALURU_CENTER, { draggable: true }).addTo(predictMap);
+            
+            function updateFormCoordinates(lat, lng) {
+                document.getElementById('input-latitude').value = lat.toFixed(6);
+                document.getElementById('input-longitude').value = lng.toFixed(6);
+            }
+
+            predictMap.on('click', function(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                predictMarker.setLatLng(e.latlng);
+                updateFormCoordinates(lat, lng);
+            });
+
+            predictMarker.on('dragend', function(e) {
+                const lat = predictMarker.getLatLng().lat;
+                const lng = predictMarker.getLatLng().lng;
+                updateFormCoordinates(lat, lng);
+            });
+        }
+
         // Set live time updates
         setInterval(() => {
             document.getElementById('live-time').innerText = new Date().toLocaleString();
@@ -584,7 +716,7 @@
             });
             // Show requested
             document.getElementById(pageId).classList.add('active');
-            
+
             // Toggle sidebar active link style
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
@@ -592,7 +724,7 @@
                     item.classList.add('active');
                 }
             });
-            
+
             // Update page title
             const titles = {
                 'dashboard': 'Operational Dashboard',
@@ -604,7 +736,7 @@
                 'reports': 'System Reports & Deliverables'
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Traffic Decisions';
-            
+
             // Trigger dynamic API loads
             if (pageId === 'performance') {
                 loadPerformanceData();
@@ -614,6 +746,9 @@
                 loadHotspots();
             } else if (pageId === 'dashboard') {
                 loadDashboardKPIs();
+                initHotspotMap();
+            } else if (pageId === 'predict') {
+                initPredictMap();
             }
         }
 
@@ -627,7 +762,7 @@
                         document.getElementById('kpi-drift').innerText = data.feature_drift.status;
                         document.getElementById('kpi-drift').style.color = data.feature_drift.status === 'No Drift' ? 'var(--accent-green)' : 'var(--accent-red)';
                     }
-                }).catch(err => {});
+                }).catch(err => { });
         }
 
         function loadPerformanceData() {
@@ -641,13 +776,13 @@
                             tbody.innerHTML += `
                                 <tr>
                                     <td><strong>${row.model}</strong></td>
-                                    <td>${(row.accuracy*100).toFixed(2)}%</td>
+                                    <td>${(row.accuracy * 100).toFixed(2)}%</td>
                                     <td>${row.train_time_sec.toFixed(3)}s</td>
                                 </tr>
                             `;
                         });
                     }
-                }).catch(err => {});
+                }).catch(err => { });
         }
 
         function loadMonitoringData() {
@@ -659,7 +794,7 @@
                         document.getElementById('mon-ram').innerText = data.memory_usage_mb.toFixed(1) + ' MB';
                     }
                 }).catch(err => { console.error('Error loading monitoring:', err); });
-                
+
             fetch('/api/history')
                 .then(res => res.json())
                 .then(data => {
@@ -672,7 +807,7 @@
                                 <tr>
                                     <td>${row.timestamp}</td>
                                     <td>v${row.model_version}</td>
-                                    <td>${(row.road_closure_prob*100).toFixed(1)}%</td>
+                                    <td>${(row.road_closure_prob * 100).toFixed(1)}%</td>
                                     <td>${row.predicted_duration.toFixed(1)}</td>
                                     <td>${row.congestion_score.toFixed(1)}</td>
                                     <td>${row.confidence_score.toFixed(1)}%</td>
@@ -682,7 +817,7 @@
                             `;
                         });
                     }
-                }).catch(err => {});
+                }).catch(err => { });
         }
 
         function submitPrediction(e) {
@@ -696,68 +831,74 @@
                     data[key] = value;
                 }
             });
-            
+
             // Temporary loading state
             document.getElementById('results-card').style.display = 'block';
             document.getElementById('out-narrative').innerText = "Processing event through ensembles and routing graph...";
-            
+
             fetch('/api/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            .then(res => res.json())
-            .then(resData => {
-                document.getElementById('out-closure').innerText = (resData.road_closure_prob * 100).toFixed(2) + '%';
-                document.getElementById('out-conf').innerText = resData.confidence_score.toFixed(1) + '%';
-                document.getElementById('out-duration').innerText = resData.predicted_duration.toFixed(1) + ' mins';
-                document.getElementById('out-range').innerText = resData.duration_min_bound.toFixed(1) + ' - ' + resData.duration_max_bound.toFixed(1) + ' mins';
-                document.getElementById('out-severity').innerText = resData.predicted_severity;
-                document.getElementById('out-congestion').innerText = resData.congestion_score.toFixed(1) + ' / 100';
-                document.getElementById('out-risk').innerText = resData.risk_level;
-                
-                document.getElementById('out-officers').innerText = resData.officers_required + ' Officers';
-                document.getElementById('out-barricades').innerText = resData.barricades_required + ' units';
-                document.getElementById('out-cones').innerText = resData.traffic_cones_required + ' units';
-                document.getElementById('out-teams').innerText = resData.diversion_teams_required + ' diversion teams';
-                document.getElementById('out-vehicles').innerText = resData.patrol_vehicles_required + ' patrol vehicles';
-                
-                document.getElementById('out-alt-junc').innerText = resData.alternative_junction;
-                document.getElementById('out-alt-corr').innerText = resData.alternative_corridor;
-                document.getElementById('out-reduction').innerText = resData.congestion_reduction.toFixed(1) + '%';
-                
-                document.getElementById('out-narrative').innerText = resData.explanation_narrative;
-                
-                // Map contributors dynamically
-                const posList = document.getElementById('pos-contributors-list');
-                posList.innerHTML = '';
-                if (Array.isArray(resData.top_positive_contributors)) {
-                    resData.top_positive_contributors.forEach(item => {
-                        posList.innerHTML += `<li style="font-size: 0.9rem; color: var(--accent-green);">• ${item}</li>`;
-                    });
-                }
-                
-                const negList = document.getElementById('neg-contributors-list');
-                negList.innerHTML = '';
-                if (Array.isArray(resData.top_negative_contributors)) {
-                    resData.top_negative_contributors.forEach(item => {
-                        negList.innerHTML += `<li style="font-size: 0.9rem; color: var(--accent-red);">• ${item}</li>`;
-                    });
-                }
-            })
-            .catch(err => {
-                document.getElementById('out-narrative').innerText = "Prediction failed: " + err;
-            });
+                .then(res => res.json())
+                .then(resData => {
+                    document.getElementById('out-closure').innerText = (resData.road_closure_prob * 100).toFixed(2) + '%';
+                    document.getElementById('out-conf').innerText = resData.confidence_score.toFixed(1) + '%';
+                    document.getElementById('out-duration').innerText = resData.predicted_duration.toFixed(1) + ' mins';
+                    document.getElementById('out-range').innerText = resData.duration_min_bound.toFixed(1) + ' - ' + resData.duration_max_bound.toFixed(1) + ' mins';
+                    document.getElementById('out-severity').innerText = resData.predicted_severity;
+                    document.getElementById('out-congestion').innerText = resData.congestion_score.toFixed(1) + ' / 100';
+                    document.getElementById('out-risk').innerText = resData.risk_level;
+
+                    document.getElementById('out-officers').innerText = resData.officers_required + ' Officers';
+                    document.getElementById('out-barricades').innerText = resData.barricades_required + ' units';
+                    document.getElementById('out-cones').innerText = resData.traffic_cones_required + ' units';
+                    document.getElementById('out-teams').innerText = resData.diversion_teams_required + ' diversion teams';
+                    document.getElementById('out-vehicles').innerText = resData.patrol_vehicles_required + ' patrol vehicles';
+
+                    document.getElementById('out-alt-junc').innerText = resData.alternative_junction;
+                    document.getElementById('out-alt-corr').innerText = resData.alternative_corridor;
+                    document.getElementById('out-reduction').innerText = resData.congestion_reduction.toFixed(1) + '%';
+
+                    document.getElementById('out-narrative').innerText = resData.explanation_narrative;
+
+                    // Map contributors dynamically
+                    const posList = document.getElementById('pos-contributors-list');
+                    posList.innerHTML = '';
+                    if (Array.isArray(resData.top_positive_contributors)) {
+                        resData.top_positive_contributors.forEach(item => {
+                            posList.innerHTML += `<li style="font-size: 0.9rem; color: var(--accent-green);">• ${item}</li>`;
+                        });
+                    }
+
+                    const negList = document.getElementById('neg-contributors-list');
+                    negList.innerHTML = '';
+                    if (Array.isArray(resData.top_negative_contributors)) {
+                        resData.top_negative_contributors.forEach(item => {
+                            negList.innerHTML += `<li style="font-size: 0.9rem; color: var(--accent-red);">• ${item}</li>`;
+                        });
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('out-narrative').innerText = "Prediction failed: " + err;
+                });
         }
-function setLanguage(lang) {
-    document.querySelectorAll('.en').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
-    document.querySelectorAll('.kn').forEach(el => el.style.display = lang === 'kn' ? 'inline' : 'none');
-}
-document.getElementById('lang-toggle').addEventListener('change', (e) => {
-    setLanguage(e.target.value);
-});
-// Initialize default language
-setLanguage('en');
-</script>
+        function setLanguage(lang) {
+            document.querySelectorAll('.en').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
+            document.querySelectorAll('.kn').forEach(el => el.style.display = lang === 'kn' ? 'inline' : 'none');
+        }
+        document.getElementById('lang-toggle').addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+        });
+        function loadHotspots() {
+            // Hotspot data is loaded statically in the table.
+            console.log("Hotspot analytical panel activated.");
+        }
+        // Initialize default language and load hotspot map
+        setLanguage('en');
+        initHotspotMap();
+    </script>
 </body>
+
 </html>
