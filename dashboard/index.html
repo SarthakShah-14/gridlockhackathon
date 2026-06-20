@@ -413,10 +413,30 @@
             </div>
 
             <div class="glass-card">
-                <h3>Bengaluru Hotspots (DBSCAN)</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Hotspots from dense incident clusters.</p>
+                <h3>Traffic Risk Zones</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Frequent traffic incident areas.</p>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; font-size: 0.9rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #ef4444; border: 2px solid rgba(239, 68, 68, 0.4);">
+                        </div>
+                        <span>High Risk Areas (Immediate attention)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #f97316; border: 2px solid rgba(249, 115, 22, 0.4);">
+                        </div>
+                        <span>Medium Risk Areas (Monitor closely)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 2px solid rgba(34, 197, 94, 0.4);">
+                        </div>
+                        <span>Low Risk Areas (Normal conditions)</span>
+                    </div>
+                </div>
                 <div id="hotspot-map"
-                    style="height: 400px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 1; background: rgba(15, 23, 42, 0.5);">
+                    style="height: 400px; border-radius: 12px; border: 2px solid rgba(6, 182, 212, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); z-index: 1; background: rgba(15, 23, 42, 0.5); overflow: hidden;">
                 </div>
             </div>
             <p id="hotspot-error" class="error" style="display:none; color: var(--accent-red); margin-top: 12px;">Error
@@ -426,20 +446,55 @@
         <!-- Subpage: Predict -->
         <div id="predict" class="subpage">
             <div class="glass-card">
-                <h3>Submit Live Incident Details</h3>
+                <h3
+                    style="background: linear-gradient(135deg, #06b6d4, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 24px; font-size: 1.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: inline-block; width: 100%;">
+                    Submit Live Incident Details</h3>
                 <!-- Interactive map for selecting location -->
-                <div id="map" class="map-container"></div>
+                <p
+                    style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Note: Pin the place on the map to auto-fill latitude and longitude.
+                </p>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; font-size: 0.9rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #ef4444; border: 2px solid rgba(239, 68, 68, 0.4);">
+                        </div>
+                        <span>High Risk Areas (Immediate attention)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #f97316; border: 2px solid rgba(249, 115, 22, 0.4);">
+                        </div>
+                        <span>Medium Risk Areas (Monitor closely)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div
+                            style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 2px solid rgba(34, 197, 94, 0.4);">
+                        </div>
+                        <span>Low Risk Areas (Normal conditions)</span>
+                    </div>
+                </div>
+                <div id="predict-map"
+                    style="height: 400px; border-radius: 12px; border: 2px solid rgba(6, 182, 212, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); z-index: 1; background: rgba(15, 23, 42, 0.5); margin-bottom: 24px; overflow: hidden;">
+                </div>
                 <form id="predict-form" onsubmit="submitPrediction(event)" novalidate>
                     <div class="grid-3" style="margin-top: 20px;">
                         <div class="form-group">
                             <label>What latitude is the incident? (ಅಕ್ಷಾಂಶ)</label>
-                            <input type="number" step="any" name="latitude" value="12.9716" required
+                            <input type="number" step="any" name="latitude" id="input-latitude" value=""
+                                placeholder="Auto-filled from map" required readonly
                                 oninvalid="this.setCustomValidity('Please enter latitude')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>What longitude is the incident? (ರೇಖಾಂಶ)</label>
-                            <input type="number" step="any" name="longitude" value="77.5946" required
+                            <input type="number" step="any" name="longitude" id="input-longitude" value=""
+                                placeholder="Auto-filled from map" required readonly
                                 oninvalid="this.setCustomValidity('Please enter longitude')"
                                 oninput="setCustomValidity('')">
                         </div>
@@ -448,8 +503,9 @@
                             <select name="priority" required
                                 oninvalid="this.setCustomValidity('Please select priority')"
                                 oninput="setCustomValidity('')">
+                                <option value="" disabled selected>Select priority</option>
                                 <option value="High">High</option>
-                                <option value="Medium" selected>Medium</option>
+                                <option value="Medium">Medium</option>
                                 <option value="Low">Low</option>
                             </select>
                         </div>
@@ -457,13 +513,13 @@
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Which junction is affected? (ಜಂಕ್ಷನ್)</label>
-                            <input type="text" name="junction" value="Kempapura Junction" required
+                            <input type="text" name="junction" value="" placeholder="e.g., Kempapura Junction" required
                                 oninvalid="this.setCustomValidity('Please enter the junction')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>Which corridor is involved? (ಕರಿಡಾರ್)</label>
-                            <input type="text" name="corridor" value="Outer Ring Road" required
+                            <input type="text" name="corridor" value="" placeholder="e.g., Outer Ring Road" required
                                 oninvalid="this.setCustomValidity('Please enter the corridor')"
                                 oninput="setCustomValidity('')">
                         </div>
@@ -472,29 +528,31 @@
                             <select name="event_type" required
                                 oninvalid="this.setCustomValidity('Please select event type')"
                                 oninput="setCustomValidity('')">
+                                <option value="" disabled selected>Select event type</option>
                                 <option value="accident">Accident</option>
                                 <option value="roadworks">Roadworks</option>
                                 <option value="procession">Procession</option>
-                                <option value="unplanned" selected>Unplanned Congestion</option>
+                                <option value="unplanned">Unplanned Congestion</option>
                             </select>
                         </div>
                     </div>
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Why did this happen? (ಕಾರಣ)</label>
-                            <input type="text" name="event_cause" value="vehicle_breakdown" required
-                                oninvalid="this.setCustomValidity('Please describe the cause')"
+                            <input type="text" name="event_cause" value="" placeholder="e.g., vehicle breakdown"
+                                required oninvalid="this.setCustomValidity('Please describe the cause')"
                                 oninput="setCustomValidity('')">
                         </div>
                         <div class="form-group">
                             <label>When does it start? (ಪ್ರಾರಂಭ ದಿನಾಂಕ‑ಸಮಯ)</label>
-                            <input type="text" name="start_datetime" value="2026-06-17 18:00:00" required
+                            <input type="datetime-local" name="start_datetime" value="" required
                                 oninvalid="this.setCustomValidity('Please enter start date and time')"
                                 oninput="setCustomValidity('')">
                         </div>
                     </div>
                     <div id="form-error" class="error"
-                        style="color: var(--accent-red); display:none; margin-bottom:8px;"></div>
+                        style="color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 600; display:none; margin-bottom:16px;">
+                    </div>
                     <button type="submit" class="btn" style="display:block;width:100%;">Generate Traffic Plan</button>
 
                 </form>
@@ -744,13 +802,13 @@
                 return;
             }
             hotspotMap = L.map('hotspot-map').setView(BENGALURU_CENTER, 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> & CARTO',
                 maxZoom: 20
             }).addTo(hotspotMap);
 
             HOTSPOTS_DATA.forEach(hotspot => {
-                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#f97316" : "#22c55e";
                 const circle = L.circle([hotspot.lat, hotspot.lon], {
                     color: color,
                     fillColor: color,
@@ -767,13 +825,13 @@
                 return;
             }
             predictMap = L.map('predict-map').setView(BENGALURU_CENTER, 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; OpenStreetMap & CARTO',
                 maxZoom: 20
             }).addTo(predictMap);
 
             HOTSPOTS_DATA.forEach(hotspot => {
-                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#06b6d4" : "#94a3b8";
+                const color = hotspot.risk === "Critical" ? "#ef4444" : hotspot.risk === "Moderate" ? "#f97316" : "#22c55e";
                 L.circle([hotspot.lat, hotspot.lon], {
                     color: color,
                     fillColor: color,
@@ -787,6 +845,23 @@
             function updateFormCoordinates(lat, lng) {
                 document.getElementById('input-latitude').value = lat.toFixed(6);
                 document.getElementById('input-longitude').value = lng.toFixed(6);
+
+                // Auto-fill junction and corridor using real-world reverse geocoding
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.address) {
+                            const road = data.address.road || data.address.neighbourhood || data.address.suburb || 'Kempapura';
+                            const suburb = data.address.suburb || data.address.city_district || 'Outer Ring Road';
+                            document.querySelector('input[name="junction"]').value = road + ' Junction';
+                            document.querySelector('input[name="corridor"]').value = suburb;
+                        }
+                    })
+                    .catch(err => {
+                        // Fallback
+                        document.querySelector('input[name="junction"]').value = 'Kempapura Junction';
+                        document.querySelector('input[name="corridor"]').value = 'Outer Ring Road';
+                    });
             }
 
             predictMap.on('click', function (e) {
@@ -934,7 +1009,21 @@
 
         function submitPrediction(e) {
             e.preventDefault();
-            const formData = new FormData(e.target);
+
+            const form = e.target;
+            const errorEl = document.getElementById('form-error');
+            errorEl.style.display = 'none';
+
+            if (!form.latitude.value) { errorEl.innerText = 'Please enter latitude (Pin a location on the map)'; errorEl.style.display = 'block'; return; }
+            if (!form.longitude.value) { errorEl.innerText = 'Please enter longitude (Pin a location on the map)'; errorEl.style.display = 'block'; return; }
+            if (!form.priority.value) { errorEl.innerText = 'Please select priority'; errorEl.style.display = 'block'; return; }
+            if (!form.junction.value.trim()) { errorEl.innerText = 'Please enter the junction'; errorEl.style.display = 'block'; return; }
+            if (!form.corridor.value.trim()) { errorEl.innerText = 'Please enter the corridor'; errorEl.style.display = 'block'; return; }
+            if (!form.event_type.value) { errorEl.innerText = 'Please select event type'; errorEl.style.display = 'block'; return; }
+            if (!form.event_cause.value.trim()) { errorEl.innerText = 'Please describe the cause'; errorEl.style.display = 'block'; return; }
+            if (!form.start_datetime.value) { errorEl.innerText = 'Please enter start date and time'; errorEl.style.display = 'block'; return; }
+
+            const formData = new FormData(form);
             const data = {};
             formData.forEach((value, key) => {
                 if (key === 'latitude' || key === 'longitude') {
