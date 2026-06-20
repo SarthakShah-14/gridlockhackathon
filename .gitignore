@@ -151,3 +151,5 @@ models/*
 presentation_guide.md
 reports/operational_incident_report.pdf
 reports/operational_incident_report.pdf
+reports/operational_incident_report.pdf
+.env.template

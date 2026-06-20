@@ -535,19 +535,13 @@ class InferencePipeline:
         
     def log_predictions(self, df_preds: pd.DataFrame):
         """
-        Logs prediction requests to models/prediction_logs.json for drift monitoring.
+        Logs prediction requests to MongoDB Atlas or falls back to models/prediction_logs.json.
         """
-        log_file = os.path.join("models", "prediction_logs.json")
-        logs = []
-        if os.path.exists(log_file):
-            try:
-                with open(log_file, "r") as f:
-                    logs = json.load(f)
-            except Exception:
-                logs = []
-                
-        # Append new records
+        from utils.db import save_prediction_log
         import json
+        
+        # Prepare records
+        records = []
         for _, row in df_preds.iterrows():
             record = {
                 'timestamp': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -561,14 +555,37 @@ class InferencePipeline:
                 'alternative_junction': str(row['alternative_junction']),
                 'latency_sec': float(row['latency_sec'])
             }
-            logs.append(record)
+            records.append(record)
             
-        # Cap log history at 200 items to avoid excessive size
-        if len(logs) > 200:
-            logs = logs[-200:]
+        # Attempt to save to MongoDB Atlas
+        saved_to_db = True
+        for record in records:
+            if not save_prediction_log(record):
+                saved_to_db = False
+                break
+                
+        # If any insert fails, or if DB is not configured, fall back to writing to local file
+        if not saved_to_db:
+            log_file = os.path.join("models", "prediction_logs.json")
+            logs = []
+            if os.path.exists(log_file):
+                try:
+                    with open(log_file, "r") as f:
+                        logs = json.load(f)
+                except Exception:
+                    logs = []
+                    
+            logs.extend(records)
             
-        try:
-            with open(log_file, "w") as f:
-                json.dump(logs, f, indent=4)
-        except Exception:
-            pass
+            # Cap local log history at 200 items to avoid excessive size
+            if len(logs) > 200:
+                logs = logs[-200:]
+                
+            try:
+                with open(log_file, "w") as f:
+                    json.dump(logs, f, indent=4)
+            except Exception:
+                pass
+
+
+

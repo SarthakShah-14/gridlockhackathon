@@ -16,4 +16,8 @@ dependencies = [
     "scipy>=1.10",
     "shap>=0.44",
     "xgboost>=1.7",
+    "pymongo>=4.0",
+    "dnspython>=2.0",
+    "python-dotenv>=1.0",
 ]
+
