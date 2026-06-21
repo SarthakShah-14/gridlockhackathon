@@ -1095,9 +1095,19 @@
                     document.getElementById('out-teams').innerText = resData.diversion_teams_required + ' diversion teams';
                     document.getElementById('out-vehicles').innerText = resData.patrol_vehicles_required + ' patrol vehicles';
 
-                    setVal('out-alt-junc', resData.alternative_junction);
-                    setVal('out-alt-corr', resData.alternative_corridor);
-                    setVal('out-reduction', resData.congestion_reduction.toFixed(1) + '%');
+                    const altJunc = resData.alternative_junction && resData.alternative_junction !== 'None' ? resData.alternative_junction : null;
+                    const altCorr = resData.alternative_corridor && resData.alternative_corridor !== 'None' ? resData.alternative_corridor : null;
+                    const reduction = resData.congestion_reduction && resData.congestion_reduction > 0 ? resData.congestion_reduction.toFixed(1) + '%' : null;
+
+                    if (altJunc) {
+                        setVal('out-alt-junc', altJunc);
+                        setVal('out-alt-corr', altCorr || 'Same corridor');
+                        setVal('out-reduction', reduction || 'N/A');
+                    } else {
+                        setVal('out-alt-junc', 'No alternate route available');
+                        setVal('out-alt-corr', 'Junction not in graph network');
+                        setVal('out-reduction', '—');
+                    }
 
                     document.getElementById('out-narrative').innerText = resData.explanation_narrative;
 
