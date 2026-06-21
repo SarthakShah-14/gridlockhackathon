@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from inference.predict import InferencePipeline
 from utils.pdf_generator import generate_incident_pdf_report
 
-PORT = 8085
+PORT = int(os.environ.get("PORT", 8085))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
@@ -137,7 +137,7 @@ def run(port=PORT):
     
     Handler = DashboardAPIHandler
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", port), Handler) as httpd:
+    with socketserver.TCPServer(("0.0.0.0", port), Handler) as httpd:
         print(f"==============================================")
         print(f"Traffic Decision Platform Live at: http://localhost:{port}")
         print(f"==============================================")
