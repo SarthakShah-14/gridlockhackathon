@@ -1,4 +1,15 @@
+---
+title: Bengaluru Traffic Decision TMC
+emoji: 🚦
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Bengaluru Event-Driven Traffic Decision Support Platform (TMC) 🚦
+
 
 A production-grade, end-to-end Machine Learning and decision intelligence platform built to predict, analyze, and mitigate traffic incidents across Bengaluru's corridor networks. 
 
