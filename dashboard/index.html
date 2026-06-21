@@ -914,6 +914,12 @@
                 document.querySelector('.sidebar').classList.toggle('collapsed');
                 document.querySelector('.main-content').classList.toggle('expanded');
             }
+
+            // Fix for map rendering issues after container resize
+            setTimeout(() => {
+                if (hotspotMap) hotspotMap.invalidateSize();
+                if (predictMap) predictMap.invalidateSize();
+            }, 350); // Wait for the 0.3s transition to finish
         }
 
         function showPage(pageId) {
