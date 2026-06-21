@@ -29,7 +29,7 @@ The system also provides SHAP-based explanations so users can understand which f
 
 The project uses several engineered features, including:
 
-- Graph-based metrics such as corridor degree, closeness, and betweenness centrality.
+- Graph-based metrics such as corridor degree, closeness and betweenness centrality.
 - Spatial hotspot detection using DBSCAN clustering.
 - Cyclical time features using sine and cosine transformations.
 - Historical corridor statistics generated without look-ahead bias.
@@ -44,7 +44,7 @@ The dashboard allows users to:
 
 - Simulate traffic incidents.
 - View prediction results in real time.
-- Estimate resource requirements such as officers, barricades, and cones.
+- Estimate resource requirements such as officers, barricades and cones.
 - Explore alternate routing suggestions.
 - Export reports in PDF and CSV formats.
 
@@ -124,7 +124,7 @@ http://localhost:8085
 ## Model Training Details
 
 - Optuna (TPE Sampler) is used for hyperparameter optimization.
-- Models include CatBoost, LightGBM, XGBoost, Random Forest, and Extra Trees.
+- Models include CatBoost, LightGBM, XGBoost, Random Forest and Extra Trees.
 - Weak base models are removed before stacking to reduce inference latency.
 - Out-of-Fold cross-validation is grouped by `junction` to avoid spatial data leakage.
 
@@ -132,7 +132,7 @@ http://localhost:8085
 
 ## Notes
 
-- `reports.zip` contains evaluation reports, SHAP summaries, and diagnostics.
+- `reports/` contains evaluation reports, SHAP summaries and diagnostics.
 - Run `run_pipeline.py` before launching the dashboard.
 - Model files are automatically generated inside `/models`.
 - The project follows a modular structure from training to inference and deployment.
