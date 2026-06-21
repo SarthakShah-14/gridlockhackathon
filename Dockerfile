@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
-# Install system dependencies (like unzip)
-RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (like unzip and libgomp1 for LightGBM)
+RUN apt-get update && apt-get install -y unzip libgomp1 && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /code
@@ -22,7 +22,7 @@ RUN mkdir -p models && \
     unzip -o models_part3.zip -d models/
 
 # Modify port and bind to 0.0.0.0 in dashboard/app.py for Hugging Face Spaces compatibility
-RUN python -c "f = open('dashboard/app.py', 'r'); c = f.read(); f.close(); c = c.replace('PORT = 8085', 'PORT = 7860').replace('(\"\", port)', '(\"0.0.0.0\", port)'); f = open('dashboard/app.py', 'w'); f.write(c); f.close()"
+RUN python -c "f = open('dashboard/app.py', 'r'); c = f.read(); c = c.replace('PORT = 8085', 'PORT = 7860').replace('(\"\", port)', '(\"0.0.0.0\", port)'); f = open('dashboard/app.py', 'w'); f.write(c); f.close()"
 
 # Expose the port Hugging Face expects
 EXPOSE 7860
