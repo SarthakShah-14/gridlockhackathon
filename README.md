@@ -52,8 +52,18 @@ This platform leverages advanced feature engineering, multi-model stacking ensem
 ├── run_pipeline.py                # Main orchestrator (End-to-End training)
 └── requirements.txt               # Project dependency versions
 ```
+## 🧰 Technologies Used
 
----
+| Layer | Technologies / Tools |
+|------|----------------------|
+| **Frontend** | HTML5, CSS3, JavaScript (ES6+), Leaflet.js, Multilingual Support (English, Kannada) |
+| **Backend** | Python 3.10, http.server, socketserver |
+| **Database** | MongoDB Atlas, PyMongo, dnspython |
+| **Machine Learning & AI** | CatBoost, XGBoost, LightGBM, Optuna, SHAP |
+| **Graph Routing & Analytics** | NetworkX, Dijkstra’s Algorithm |
+| **Reporting & Visualization** | Matplotlib, Custom PDF Report Generator |
+| **Containerization & Dependencies** | Docker, OpenMP, libgomp1 |
+| **Cloud Hosting & Deployment** | Hugging Face Spaces (Docker-based deployment) |
 
 ## ⚡ Quick Start
 
