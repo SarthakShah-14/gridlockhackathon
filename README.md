@@ -1,42 +1,56 @@
----
-title: Bengaluru Traffic Decision TMC
-emoji: 🚦
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # Bengaluru Event-Driven Traffic Decision Support Platform (TMC) 🚦
 
+This project was built to help traffic management teams make faster and better decisions during road incidents in Bengaluru. It uses machine learning models to predict road closures, incident duration, congestion impact, and incident severity, then presents the results through an interactive dashboard.
 
-A production-grade, end-to-end Machine Learning and decision intelligence platform built to predict, analyze, and mitigate traffic incidents across Bengaluru's corridor networks. 
+## 🌐 Live Demo
 
-This platform leverages advanced feature engineering, multi-model stacking ensembles, Explainable AI (SHAP), graph transition centralities, and real-time inference latency monitoring, served through a custom glassmorphism web dashboard.
-
----
-
-## 🚀 Key Platform Features
-
-- **Multi-Target Decision Intel**:
-  1. **Road Closure Classifier**: Stacking ensemble of tree-based algorithms calibrated using probability scaling (ECE/Brier score optimized).
-  2. **Incident Duration Regressor**: Forecasts incident clearance times (using log-transformed target space and 99th percentile outlier pruning).
-  3. **Congestion Index Regressor**: Formulates dynamic congestion score impact metrics.
-  4. **Multi-class Incident Severity Classifier**: Estimates emergency dispatch levels.
-- **Advanced Feature Engineering**:
-  - **Graph Topology**: Extracts corridor degree, closeness, and betweenness centralities from historical transit network graphs.
-  - **Spatial Hotspots**: Dynamic clustering of coordinates via DBSCAN.
-  - **Cyclic Time Encodings**: Transforms hour & weekday to cyclic sin/cos spaces.
-  - **Leakage-Free Statistics**: Historical corridor aggregates computed without lookahead bias.
-- **Explainable AI (XAI)**:
-  - Global and local SHAP explanations integrated directly into prediction pathways.
-- **Interactive Decision Dashboard**:
-  - Custom UI to simulate incident triggers, view automated resource allocation metrics (officers, barricades, cones required), request dynamic routing alternatives, and export operational reports (PDF & CSV).
+https://sarthak1410-gridlock-hackathon.hf.space/
 
 ---
 
-## 🛠️ Project Structure
+## What This Project Does
+
+The platform takes incident-related information and generates predictions that can help traffic authorities respond more effectively.
+
+It includes:
+
+- **Road Closure Prediction** using a stacking ensemble of tree-based models.
+- **Incident Duration Prediction** to estimate how long an incident may take to clear.
+- **Congestion Index Prediction** to measure expected traffic impact.
+- **Incident Severity Classification** to estimate response priority levels.
+
+The system also provides SHAP-based explanations so users can understand which features influenced the predictions.
+
+---
+
+## Key Features
+
+### Feature Engineering
+
+The project uses several engineered features, including:
+
+- Graph-based metrics such as corridor degree, closeness, and betweenness centrality.
+- Spatial hotspot detection using DBSCAN clustering.
+- Cyclical time features using sine and cosine transformations.
+- Historical corridor statistics generated without look-ahead bias.
+
+### Explainable AI
+
+- Global and local SHAP explanations for model predictions.
+
+### Dashboard Features
+
+The dashboard allows users to:
+
+- Simulate traffic incidents.
+- View prediction results in real time.
+- Estimate resource requirements such as officers, barricades, and cones.
+- Explore alternate routing suggestions.
+- Export reports in PDF and CSV formats.
+
+---
+
+## Project Structure
 
 ```text
 ├── dashboard/
@@ -47,69 +61,85 @@ This platform leverages advanced feature engineering, multi-model stacking ensem
 ├── training/                      # Optuna hyperparameter tuning & stacking meta-models
 ├── evaluation/                    # SHAP XAI & diagnostic error analysis reports
 ├── inference/                     # Live prediction pipeline & similarity retrievers
-├── models/                        # Serialized pipeline parameters (gitignored binary files)
-├── reports/                       # Auto-generated diagnostics (error analysis, plots)
-├── run_pipeline.py                # Main orchestrator (End-to-End training)
-└── requirements.txt               # Project dependency versions
+├── models/                        # Serialized pipeline parameters
+├── reports/                       # Auto-generated diagnostics
+├── run_pipeline.py                # Main training pipeline
+└── requirements.txt               # Project dependencies
 ```
-## 🧰 Technologies Used
+
+## Technologies Used
 
 | Layer | Technologies / Tools |
-|------|----------------------|
-| **Frontend** | HTML5, CSS3, JavaScript (ES6+), Leaflet.js, Multilingual Support (English, Kannada) |
-| **Backend** | Python 3.10, http.server, socketserver |
-| **Database** | MongoDB Atlas, PyMongo, dnspython |
-| **Machine Learning & AI** | CatBoost, XGBoost, LightGBM, Optuna, SHAP |
-| **Graph Routing & Analytics** | NetworkX, Dijkstra’s Algorithm |
-| **Reporting & Visualization** | Matplotlib, Custom PDF Report Generator |
-| **Containerization & Dependencies** | Docker, OpenMP, libgomp1 |
-| **Cloud Hosting & Deployment** | Hugging Face Spaces (Docker-based deployment) |
+|---------|----------------------|
+| Frontend | HTML5, CSS3, JavaScript (ES6+), Leaflet.js, English & Kannada Support |
+| Backend | Python 3.10, http.server, socketserver |
+| Database | MongoDB Atlas, PyMongo, dnspython |
+| Machine Learning | CatBoost, XGBoost, LightGBM, Optuna, SHAP |
+| Graph Analytics | NetworkX, Dijkstra's Algorithm |
+| Visualization & Reporting | Matplotlib, Custom PDF Report Generator |
+| Deployment | Docker, Hugging Face Spaces |
 
-## ⚡ Quick Start
+---
 
-### 1. Prerequisites & Setup
-Ensure you have a Python virtual environment activated:
+## Quick Start
+
+### 1. Install Dependencies
+
+Make sure your virtual environment is activated.
+
 ```bash
-# Activate your environment
 .\gridhackenvanti\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Run the ML Pipeline
-This will clean the data, engineer graph/temporal features, run Optuna Bayesian hyperparameter search, train base models, stack them with a calibrated meta-learner, and export prediction parameters:
+### 2. Run the Training Pipeline
+
 ```bash
 python run_pipeline.py
 ```
-*Note: This generates trained model artifacts under the `models/` directory and creates an `error_analysis_report.md` in the `reports/` folder.*
+
+This will:
+
+- Clean and preprocess the data.
+- Generate graph and temporal features.
+- Run Optuna hyperparameter tuning.
+- Train and stack multiple models.
+- Generate model artifacts and evaluation reports.
 
 ### 3. Launch the Dashboard
-Run the server and open the operational interface in your browser:
+
 ```bash
 python dashboard/app.py
 ```
-Open **[http://localhost:8085](http://localhost:8085)** in your web browser.
+
+Then open:
+
+```text
+http://localhost:8085
+```
 
 ---
 
-## 📊 Stacking Model Performance & Tuning
+## Model Training Details
 
-- Models optimized using **Optuna (TPE Sampler)** across 5 algorithms: **CatBoost, LightGBM, XGBoost, Random Forest, and Extra Trees**.
-- Dynamic base-model selection drops weak estimators before meta-learning to minimize online latency.
-- Out-of-Fold (OOF) cross-validation grouped by `junction` to prevent spatial data leakage.
-
-## 📦 Notes for Evaluators
-
-- `reports.zip` is included as a compressed bundle of evaluation outputs, SHAP summaries, and diagnostics
-
-- Run `run_pipeline.py` before starting the dashboard
-- Model artifacts are auto-generated in `/models`
-- Fully modular pipeline (training → inference → UI)
-- Designed for real-world traffic management deployment
+- Optuna (TPE Sampler) is used for hyperparameter optimization.
+- Models include CatBoost, LightGBM, XGBoost, Random Forest, and Extra Trees.
+- Weak base models are removed before stacking to reduce inference latency.
+- Out-of-Fold cross-validation is grouped by `junction` to avoid spatial data leakage.
 
 ---
 
-## 🚀 One-Line Summary
+## Notes
 
-An AI-powered Traffic Management System that transforms raw incident data into real-time, explainable, and operational decisions for Bengaluru’s traffic control ecosystem.
+- `reports.zip` contains evaluation reports, SHAP summaries, and diagnostics.
+- Run `run_pipeline.py` before launching the dashboard.
+- Model files are automatically generated inside `/models`.
+- The project follows a modular structure from training to inference and deployment.
+- Designed as a practical traffic management solution for Bengaluru road networks.
+
+---
+
+## Summary
+
+A machine learning-based traffic management platform that converts incident data into actionable predictions and operational insights for Bengaluru's traffic network.
