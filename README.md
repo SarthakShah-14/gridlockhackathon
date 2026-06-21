@@ -88,3 +88,18 @@ Open **[http://localhost:8085](http://localhost:8085)** in your web browser.
 - Models optimized using **Optuna (TPE Sampler)** across 5 algorithms: **CatBoost, LightGBM, XGBoost, Random Forest, and Extra Trees**.
 - Dynamic base-model selection drops weak estimators before meta-learning to minimize online latency.
 - Out-of-Fold (OOF) cross-validation grouped by `junction` to prevent spatial data leakage.
+
+## 📦 Notes for Evaluators
+
+- `reports.zip` is included as a compressed bundle of evaluation outputs, SHAP summaries, and diagnostics
+
+- Run `run_pipeline.py` before starting the dashboard
+- Model artifacts are auto-generated in `/models`
+- Fully modular pipeline (training → inference → UI)
+- Designed for real-world traffic management deployment
+
+---
+
+## 🚀 One-Line Summary
+
+An AI-powered Traffic Management System that transforms raw incident data into real-time, explainable, and operational decisions for Bengaluru’s traffic control ecosystem.
