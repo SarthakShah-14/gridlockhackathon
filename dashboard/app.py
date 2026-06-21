@@ -10,6 +10,7 @@ import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from inference.predict import InferencePipeline
+from utils.pdf_generator import generate_incident_pdf_report
 
 PORT = int(os.environ.get("PORT", 8085))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +31,10 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
                 pipeline = InferencePipeline(models_dir="models")
                 scored = pipeline.predict_one(event)
                 
-
+                # Generate PDF Operational report
+                report_path = os.path.abspath(os.path.join("reports", "operational_incident_report.pdf"))
+                generate_incident_pdf_report(scored, report_path)
+                
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
@@ -56,6 +60,8 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.serve_json_file(os.path.join("models", "prediction_logs.json"))
         elif self.path == '/api/experiment':
             self.serve_json_file(os.path.join("models", "experiment_history.json"))
+        elif self.path == '/api/download_pdf':
+            self.serve_pdf_file(os.path.join("reports", "operational_incident_report.pdf"))
         elif self.path == '/api/download_csv':
             self.generate_and_serve_csv(os.path.join("models", "prediction_logs.json"))
         elif self.path.startswith('/api/reports/'):
@@ -77,6 +83,18 @@ class DashboardAPIHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps([]).encode('utf-8'))
+            
+    def serve_pdf_file(self, filepath):
+        if os.path.exists(filepath):
+            self.send_response(200)
+            self.send_header('Content-type', 'application/pdf')
+            self.send_header('Content-Disposition', 'attachment; filename="operational_incident_report.pdf"')
+            self.end_headers()
+            with open(filepath, 'rb') as f:
+                self.wfile.write(f.read())
+        else:
+            self.send_response(404)
+            self.end_headers()
             
     def serve_image_file(self, filepath):
         if os.path.exists(filepath):
