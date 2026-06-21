@@ -21,8 +21,8 @@ RUN mkdir -p models && \
     unzip -o models_part2.zip -d models/ && \
     unzip -o models_part3.zip -d models/
 
-# Modify port in dashboard/app.py to 7860 for Hugging Face Spaces compatibility
-RUN python -c "with open('dashboard/app.py', 'r') as f: c = f.read(); c = c.replace('PORT = 8085', 'PORT = 7860'); \
+# Modify port and bind to 0.0.0.0 in dashboard/app.py for Hugging Face Spaces compatibility
+RUN python -c "with open('dashboard/app.py', 'r') as f: c = f.read(); c = c.replace('PORT = 8085', 'PORT = 7860').replace('(\"\", port)', '(\"0.0.0.0\", port)'); \
     with open('dashboard/app.py', 'w') as f: f.write(c)"
 
 # Expose the port Hugging Face expects
